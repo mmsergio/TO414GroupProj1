@@ -55,7 +55,6 @@ normalize <- function(x) {
 tele_norm <- as.data.frame(lapply(tele_random, normalize))
 ```
 
-
 ## Getting Train and Test Samples
 
 ```{r}
