@@ -95,15 +95,15 @@ plot(neuralmod)
 ## Testing Neural Net Performance
 
 ```{r}
-tele_test1$prediction <- predict(ann_model, tele_test1)
-tele_test1$prediction <- ifelse(tele_test1$prediction > 0.5, 1, 0)
+neural_test$prediction <- predict(neuralmod, neural_test)
+neural_test$prediction <- ifelse(neural_test$prediction > 0.5, 1, 0)
+  #Add column with prediction
+CrossTable(x = neural_test$prediction, y = neural_test$yyes, prop.chisq=FALSE)
 
-CrossTable(x = tele_test1$prediction, y = tele_test1$yyes, prop.chisq=FALSE)
+confusionMatrix(as.factor(neural_test$prediction), as.factor(neural_test$yyes), positive = "1")
+  #Compare yyes and prediction variable in the matrix
 
-confusionMatrix(as.factor(tele_test1$prediction), as.factor(tele_test1$yyes), positive = "1")
-
-
-#Do not know about this
+#Do not know about this, lines above work better and are simpler
 neural_results <- compute(neuralmod, neural_test)
 predicted_yes <- neural_results$net.result
 predicted_yes <- as.vector(ifelse(predicted_yes>0.55,1,0))
