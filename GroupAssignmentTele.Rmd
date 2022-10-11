@@ -73,7 +73,7 @@ tele_test <- tele_norm[test_set, -match("yyes",names(tele_norm))]
 tele_train_labels <- tele_norm[-test_set, "yyes"]
 tele_test_labels <- tele_norm[test_set, "yyes"]
 
-```
+    ```
 
 > Now you are ready to build your ANN model. Feel free to modify the data load, cleaning and preparation code above as per your preference.
 
@@ -81,19 +81,20 @@ tele_test_labels <- tele_norm[test_set, "yyes"]
 
 ```{r, cache=TRUE}
 library(neuralnet)
-test_rows <- sample(1:nrow(tele_norm), 33000)
+library(gmodels)
+library(caret)
+
+test_rows <- sample(1:nrow(tele_norm), 8000)
 neural_train <- tele_norm[test_rows, ]
 neural_test <- tele_norm[-test_rows, ]
+
 neuralmod <- neuralnet(yyes~., data=neural_train)
+
 plot(neuralmod)
 ```
 ## Testing Neural Net Performance
 
 ```{r}
-library(gmodels)
-library(caret)
-neural_train_label <- tele_norm[test_rows, "yyes"]
-neural_test_label <- tele_norm[-test_rows, "yyes"]
 neural_results <- compute(neuralmod, neural_test)
 predicted_yes <- neural_results$net.result
 predicted_yes <- as.vector(ifelse(predicted_yes>0.55,1,0))
