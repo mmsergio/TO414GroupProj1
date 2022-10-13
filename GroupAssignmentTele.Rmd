@@ -31,6 +31,7 @@ tele$pdaysdummy <- ifelse(tele$pdays == 999, 0, 1)
 tele$pdays <- NULL
 
 str(tele)
+summary(tele)
 ```
 
 ## Getting Data Ready for Analysis
@@ -57,6 +58,12 @@ tele_norm <- as.data.frame(lapply(tele_random, normalize))
 
 ## Clustering the data
 
+```{r}
+
+tele_z <- as.data.frame(lapply(tele_norm, scale))
+tele_clusters <- kmeans(tele_z, 5)
+
+```
 
 
 
@@ -108,12 +115,6 @@ CrossTable(x = neural_test$prediction, y = neural_test$yyes, prop.chisq=FALSE)
 confusionMatrix(as.factor(neural_test$prediction), as.factor(neural_test$yyes), positive = "1")
   #Compare yyes and prediction variable in the matrix
 
-#Do not know about this, lines above work better and are simpler
-neural_results <- compute(neuralmod, neural_test)
-predicted_yes <- neural_results$net.result
-predicted_yes <- as.vector(ifelse(predicted_yes>0.55,1,0))
-predicted_yes <- as.factor(predicted_yes)
-neural_test_label <- as.factor(neural_test_label)
-confusionMatrix(predicted_yes, neural_test_label, positive = "1")
+
 ```
 
