@@ -59,9 +59,13 @@ tele_norm <- as.data.frame(lapply(tele_random, normalize))
 ## Clustering the data
 
 ```{r}
-
 tele_z <- as.data.frame(lapply(tele_norm, scale))
+tele_z$yyes <- NULL
+  #We use normalized so the data set is numeric
 tele_clusters <- kmeans(tele_z, 5)
+
+tele_clusters$centers
+
 
 ```
 
