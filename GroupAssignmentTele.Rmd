@@ -69,14 +69,89 @@ tele_clusters <- kmeans(tele_z, 5)
 tele_clusters$centers 
 
 tele_norm$cluster <- tele_clusters$cluster
-  #Cluster ID into the original data set
+  #Cluster ID into the normalized data set
 
 aggregate(data = tele_norm, yyes ~ cluster, mean)
+  #Cluster 3 and 4 no need to build a regression, already reach the 16% threshold
+
+#Creating 3 new data sets for each cluster
+
+tele_norm_cl1 <- subset(tele_norm, cluster == 1)
+tele_norm_cl2 <- subset(tele_norm, cluster == 2)
+tele_norm_cl5 <- subset(tele_norm, cluster == 5)
+```
+
+## Building a Logistic Regression
+
+```{r}
+#For those in cluster 1
+set.seed(12345)
+test_cl1 <- sample(1:nrow(tele_norm_cl1), 2500)
+tele_norm_cl1_train <- tele_norm_cl1[-test_cl1,]
+tele_norm_cl1_test <- tele_norm_cl1[test_cl1,]
+  #We create the test and train data set
+
+reg1 <- glm(yyes ~ ., data = tele_norm_cl1_train)
+reg1 <-  step(reg1, direction = "backward")
+  #Optimizing the regression
+
+tele_norm_cl1_test$yyes <- NULL
+tele_norm_cl1_test$yyes <- predict(reg1, newdata = tele_norm_cl1_test, type = "response")
+tele_norm_cl1_test$yyes <- ifelse(tele_norm_cl1_test$yyes > 0.5, 1, 0)
+  #Create yyes column in test data set with the predictions from the regression
+
+tele_norm_cl1_testlabels <- tele_norm_cl1[test_cl1, "yyes"]
+
+CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_test$yye, prop.chisq=FALSE)
+  #Esto hay que revisarlo bien porque nos estamos dejando a mucha gente que compraria
+
+
+
+#For those in cluster 2
+set.seed(12345)
+test_cl2 <- sample(1:nrow(tele_norm_cl2), 3000)
+tele_norm_cl2_train <- tele_norm_cl2[-test_cl2,]
+tele_norm_cl2_test <- tele_norm_cl2[test_cl2,]
+
+reg2 <- glm(yyes ~ ., data = tele_norm_cl2_train)
+reg2 <-  step(reg2, direction = "backward")
+  #Optimizing
+
+tele_norm_cl2_test$yyes <- NULL
+tele_norm_cl2_test$yyes <- predict(reg2, newdata = tele_norm_cl2_test, type = "response")
+tele_norm_cl2_test$yyes <- ifelse(tele_norm_cl2_test$yyes > 0.5, 1, 0)
+
+tele_norm_cl2_testlabels <- tele_norm_cl2[test_cl2, "yyes"]
+
+CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_test$yye, prop.chisq=FALSE)
+  #Revisar esto también
+
+
+
+#For those in cluster 5
+set.seed(12345)
+test_cl5 <- sample(1:nrow(tele_norm_cl5), 1100)
+tele_norm_cl5_train <- tele_norm_cl5[-test_cl5,]
+tele_norm_cl5_test <- tele_norm_cl5[test_cl5,]
+
+reg5 <- glm(yyes ~ ., data = tele_norm_cl5_train)
+reg5 <-  step(reg5, direction = "backward")
+
+tele_norm_cl5_test$yyes <- NULL
+tele_norm_cl5_test$yyes <- predict(reg5, newdata = tele_norm_cl5_test, type = "response")
+tele_norm_cl5_test$yyes <- ifelse(tele_norm_cl5_test$yyes > 0.5, 1, 0)
+
+tele_norm_cl5_testlabels <- tele_norm_cl5[test_cl5, "yyes"]
+
+CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yye, prop.chisq=FALSE)
+
+
+  #En todas nos estamos dejando a mucha gente, no tiene pinta que esta forma de predecir sea muy buena
 ```
 
 
 
-## Getting Train and Test Samples for KNN model
+## Buidling a KNN model
 
 ```{r}
 # Selects 10000 random rows for test data
@@ -117,11 +192,12 @@ neuralmod <- neuralnet(yyes~., data=neural_train)
 neural_test$prediction <- predict(neuralmod, neural_test)
 neural_test$prediction <- ifelse(neural_test$prediction > 0.5, 1, 0)
   #Add column with prediction
+```
 CrossTable(x = neural_test$prediction, y = neural_test$yyes, prop.chisq=FALSE)
 
 confusionMatrix(as.factor(neural_test$prediction), as.factor(neural_test$yyes), positive = "1")
   #Compare yyes and prediction variable in the matrix
 
 
-```
+
 
