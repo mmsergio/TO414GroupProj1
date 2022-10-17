@@ -17,6 +17,11 @@ Describe as-is state and to be state
 ## Downloading and Prepping the Data
 
 ```{r}
+library(neuralnet)
+library(gmodels)
+library(caret)
+library(class)
+
 #Downloading and Prepping the Data
 tele <- read.csv("tele.csv", stringsAsFactors = TRUE)
 summary(tele)
@@ -95,14 +100,14 @@ reg1 <- glm(yyes ~ ., data = tele_norm_cl1_train)
 reg1 <-  step(reg1, direction = "backward")
   #Optimizing the regression
 
-tele_norm_cl1_test$yyes <- NULL
-tele_norm_cl1_test$yyes <- predict(reg1, newdata = tele_norm_cl1_test, type = "response")
-tele_norm_cl1_test$yyes <- ifelse(tele_norm_cl1_test$yyes > 0.5, 1, 0)
+tele_norm_cl1_test$yyes1 <- NULL
+tele_norm_cl1_test$yyes1 <- predict(reg1, newdata = tele_norm_cl1_test, type = "response")
+tele_norm_cl1_test$yyes1 <- ifelse(tele_norm_cl1_test$yyes1 > 0.5, 1, 0)
   #Create yyes column in test data set with the predictions from the regression
 
 tele_norm_cl1_testlabels <- tele_norm_cl1[test_cl1, "yyes"]
 
-CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_test$yye, prop.chisq=FALSE)
+CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_test$yyes1, prop.chisq=FALSE)
   #Esto hay que revisarlo bien porque nos estamos dejando a mucha gente que compraria
 
 
@@ -117,13 +122,13 @@ reg2 <- glm(yyes ~ ., data = tele_norm_cl2_train)
 reg2 <-  step(reg2, direction = "backward")
   #Optimizing
 
-tele_norm_cl2_test$yyes <- NULL
-tele_norm_cl2_test$yyes <- predict(reg2, newdata = tele_norm_cl2_test, type = "response")
-tele_norm_cl2_test$yyes <- ifelse(tele_norm_cl2_test$yyes > 0.5, 1, 0)
+tele_norm_cl2_test$yyes1 <- NULL
+tele_norm_cl2_test$yyes1 <- predict(reg2, newdata = tele_norm_cl2_test, type = "response")
+tele_norm_cl2_test$yyes1 <- ifelse(tele_norm_cl2_test$yyes1 > 0.5, 1, 0)
 
 tele_norm_cl2_testlabels <- tele_norm_cl2[test_cl2, "yyes"]
 
-CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_test$yye, prop.chisq=FALSE)
+CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_test$yyes1, prop.chisq=FALSE)
   #Revisar esto también
 
 
@@ -137,13 +142,13 @@ tele_norm_cl5_test <- tele_norm_cl5[test_cl5,]
 reg5 <- glm(yyes ~ ., data = tele_norm_cl5_train)
 reg5 <-  step(reg5, direction = "backward")
 
-tele_norm_cl5_test$yyes <- NULL
-tele_norm_cl5_test$yyes <- predict(reg5, newdata = tele_norm_cl5_test, type = "response")
-tele_norm_cl5_test$yyes <- ifelse(tele_norm_cl5_test$yyes > 0.5, 1, 0)
+tele_norm_cl5_test$yyes1 <- NULL
+tele_norm_cl5_test$yyes1 <- predict(reg5, newdata = tele_norm_cl5_test, type = "response")
+tele_norm_cl5_test$yyes1 <- ifelse(tele_norm_cl5_test$yyes1 > 0.5, 1, 0)
 
 tele_norm_cl5_testlabels <- tele_norm_cl5[test_cl5, "yyes"]
 
-CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yye, prop.chisq=FALSE)
+CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes1, prop.chisq=FALSE)
 
 
   #En todas nos estamos dejando a mucha gente, no tiene pinta que esta forma de predecir sea muy buena
@@ -151,34 +156,49 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yye, prop.chisq=
 
 
 
-## Buidling a KNN model
-
+## Building a KNN Model
 ```{r}
-# Selects 10000 random rows for test data
-set.seed(12345)
-test_set <- sample(1:nrow(tele_norm), 10000) 
-# Depending on R-version and computer, different rows may be selected. 
-# If that happens, results are different. 
+#CLUSTER 1
+tele_norm_cl1_train$yyes <- NULL
+  #We remove the yyes column from the train test
 
-# Create a train set and test set
-#First the predictors - all columns except the yyes column
-tele_train <- tele_norm[-test_set, -match("yyes",names(tele_norm))]
-tele_test <- tele_norm[test_set, -match("yyes",names(tele_norm))]
+tele_norm_cl1_trainlabels <- tele_norm_cl1[-test_cl1, "yyes"]
+  #Create labels for the true results (basically yyes variable)
 
-#Now the response (aka Labels) - only the yyes column
-tele_train_labels <- tele_norm[-test_set, "yyes"]
-tele_test_labels <- tele_norm[test_set, "yyes"]
+tele_norm_cl1_knnprediction <- knn(train = tele_norm_cl1_train, test = tele_norm_cl1_test[-tele_norm_cl1_test$yyes1],
+                      cl = tele_norm_cl1_trainlabels, k=2)
+CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_knnprediction, prop.chisq=FALSE)
+  #Extremely bad result
 
-    ```
+tele_norm_cl1_test$yyes2 <- tele_norm_cl1_knnprediction
+  #We add the preduction to the test as a new  variable
 
-> Now you are ready to build your ANN model. Feel free to modify the data load, cleaning and preparation code above as per your preference.
 
-## Building ANN Model
+#CLUSTER 2
+tele_norm_cl2_train$yyes <- NULL
+tele_norm_cl2_trainlabels <- tele_norm_cl2[-test_cl2, "yyes"]
+tele_norm_cl2_knnprediction <- knn(train = tele_norm_cl2_train, test = tele_norm_cl2_test[-tele_norm_cl2_test$yyes1],
+                      cl = tele_norm_cl2_trainlabels, k=5)
+CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_knnprediction, prop.chisq=FALSE)
+  #Again very bad results
+
+tele_norm_cl2_test$yyes2 <- tele_norm_cl2_knnprediction
+
+
+#CLUSTER 5
+tele_norm_cl5_train$yyes <- NULL
+tele_norm_cl5_trainlabels <- tele_norm_cl5[-test_cl5, "yyes"]
+tele_norm_cl5_knnprediction <- knn(train = tele_norm_cl5_train, test = tele_norm_cl5_test[-tele_norm_cl5_test$yyes1],
+                      cl = tele_norm_cl5_trainlabels, k=6)
+CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_knnprediction, prop.chisq=FALSE)
+
+tele_norm_cl5_test$yyes2 <- tele_norm_cl5_knnprediction
+```
+
+
+
 
 ```{r, cache=TRUE}
-library(neuralnet)
-library(gmodels)
-library(caret)
 
 test_rows <- sample(1:nrow(tele_norm), 8000)
 neural_train <- tele_norm[test_rows, ]
@@ -186,18 +206,18 @@ neural_test <- tele_norm[-test_rows, ]
 
 neuralmod <- neuralnet(yyes~., data=neural_train)
 ```
-## Testing Neural Net Performance
+## Building a Neural Net 
 
 ```{r}
 neural_test$prediction <- predict(neuralmod, neural_test)
 neural_test$prediction <- ifelse(neural_test$prediction > 0.5, 1, 0)
   #Add column with prediction
-```
+
 CrossTable(x = neural_test$prediction, y = neural_test$yyes, prop.chisq=FALSE)
 
 confusionMatrix(as.factor(neural_test$prediction), as.factor(neural_test$yyes), positive = "1")
   #Compare yyes and prediction variable in the matrix
-
+```
 
 
 
