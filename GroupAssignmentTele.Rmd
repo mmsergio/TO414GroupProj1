@@ -157,67 +157,105 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes1, prop.chis
 
 
 ## Building a KNN Model
-```{r}
-#CLUSTER 1
-tele_norm_cl1_train$yyes <- NULL
-  #We remove the yyes column from the train test
-
-tele_norm_cl1_trainlabels <- tele_norm_cl1[-test_cl1, "yyes"]
-  #Create labels for the true results (basically yyes variable)
-
-tele_norm_cl1_knnprediction <- knn(train = tele_norm_cl1_train, test = tele_norm_cl1_test[-tele_norm_cl1_test$yyes1],
-                      cl = tele_norm_cl1_trainlabels, k=2)
-CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_knnprediction, prop.chisq=FALSE)
-  #Extremely bad result
-
-tele_norm_cl1_test$yyes2 <- tele_norm_cl1_knnprediction
-  #We add the preduction to the test as a new  variable
-
-
-#CLUSTER 2
-tele_norm_cl2_train$yyes <- NULL
-tele_norm_cl2_trainlabels <- tele_norm_cl2[-test_cl2, "yyes"]
-tele_norm_cl2_knnprediction <- knn(train = tele_norm_cl2_train, test = tele_norm_cl2_test[-tele_norm_cl2_test$yyes1],
-                      cl = tele_norm_cl2_trainlabels, k=5)
-CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_knnprediction, prop.chisq=FALSE)
-  #Again very bad results
-
-tele_norm_cl2_test$yyes2 <- tele_norm_cl2_knnprediction
-
-
-#CLUSTER 5
-tele_norm_cl5_train$yyes <- NULL
-tele_norm_cl5_trainlabels <- tele_norm_cl5[-test_cl5, "yyes"]
-tele_norm_cl5_knnprediction <- knn(train = tele_norm_cl5_train, test = tele_norm_cl5_test[-tele_norm_cl5_test$yyes1],
-                      cl = tele_norm_cl5_trainlabels, k=6)
-CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_knnprediction, prop.chisq=FALSE)
-
-tele_norm_cl5_test$yyes2 <- tele_norm_cl5_knnprediction
-```
-
-
-
-
-```{r, cache=TRUE}
-
-test_rows <- sample(1:nrow(tele_norm), 8000)
-neural_train <- tele_norm[test_rows, ]
-neural_test <- tele_norm[-test_rows, ]
-
-neuralmod <- neuralnet(yyes~., data=neural_train)
-```
 ## Building a Neural Net 
 
 ```{r}
-neural_test$prediction <- predict(neuralmod, neural_test)
-neural_test$prediction <- ifelse(neural_test$prediction > 0.5, 1, 0)
+tele_norm_cl1_train$yyes <- tele_norm_cl1_trainlabels
+  #Restore the yyes column
+
+neuralmod_cl1 <- neuralnet(yyes~., data=tele_norm_cl1_train)
+
+tele_norm_cl1_test$yyes3 <- predict(neuralmod_cl1, tele_norm_cl1_test)
+tele_norm_cl1_test$yyes3 <- ifelse(tele_norm_cl1_test$yyes3 > 0.6, 1, 0)
   #Add column with prediction
 
-CrossTable(x = neural_test$prediction, y = neural_test$yyes, prop.chisq=FALSE)
+CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_test$yyes3, prop.chisq=FALSE)
 
-confusionMatrix(as.factor(neural_test$prediction), as.factor(neural_test$yyes), positive = "1")
-  #Compare yyes and prediction variable in the matrix
+confusionMatrix(as.factor(tele_norm_cl1_test$yyes3), as.factor( tele_norm_cl1_testlabels), positive = "1")
+  #Notice that is inverted (compared to the Cross Table)
+
+
+
+
+#CLUSTER 2
+tele_norm_cl2_train$yyes <- tele_norm_cl2_trainlabels
+
+neuralmod_cl2 <- neuralnet(yyes~., data=tele_norm_cl2_train)
+
+tele_norm_cl2_test$yyes3 <- predict(neuralmod_cl2, tele_norm_cl2_test)
+tele_norm_cl2_test$yyes3 <- ifelse(tele_norm_cl2_test$yyes3 > 0.5, 1, 0)
+
+CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_test$yyes3, prop.chisq=FALSE)
+
+confusionMatrix(as.factor(tele_norm_cl2_test$yyes3), as.factor(tele_norm_cl2_testlabels), positive = "1")
+
+
+
+
+#CLUSTER 5
+tele_norm_cl5_train$yyes <- tele_norm_cl5_trainlabels
+
+neuralmod_cl5 <- neuralnet(yyes~., data=tele_norm_cl5_train)
+
+tele_norm_cl5_test$yyes3 <- predict(neuralmod_cl5, tele_norm_cl5_test)
+tele_norm_cl5_test$yyes3 <- ifelse(tele_norm_cl5_test$yyes3 > 0.4, 1, 0)
+
+CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes3, prop.chisq=FALSE)
+
+confusionMatrix(as.factor(tele_norm_cl5_test$yyes3), as.factor(tele_norm_cl5_testlabels), positive = "1")
+
 ```
+
+
+
+
+## Building a Join Prediction
+```{r}
+#Now we will use the predictions from the previous tests to build a joint prediction
+
+#CLUSTER 1
+tele_norm_cl1_test$yyes4 <- NULL
+  #For debugging purposes
+tele_norm_cl1_test$yyes4 <- ifelse((as.numeric(as.integer(tele_norm_cl1_test$yyes1)) + 
+                                     as.numeric(as.integer(tele_norm_cl1_test$yyes2)) + 
+                                     as.numeric(as.character(tele_norm_cl1_test$yyes3))) > 1, 1, 0 )
+
+  #If the sum of the three predictions is more than one, it means that two or more of those three predictors is one, and thus, we get a 1 in the final prediction
+
+CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_test$yyes4, prop.chisq=FALSE)
+  #23% no está nada mal
+
+
+
+
+
+#CLUSTER 2
+tele_norm_cl2_test$yyes4 <- NULL
+tele_norm_cl2_test$yyes4 <- ifelse((as.numeric(as.integer(tele_norm_cl2_test$yyes1)) + 
+                                     as.numeric(as.integer(tele_norm_cl2_test$yyes2)) + 
+                                     as.numeric(as.character(tele_norm_cl2_test$yyes3))) > 1, 1, 0 )
+
+CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_test$yyes4, prop.chisq=FALSE)
+
+
+
+#CLUSTER 5
+tele_norm_cl5_test$yyes4 <- NULL
+tele_norm_cl5_test$yyes4 <- ifelse((as.numeric(as.integer(tele_norm_cl5_test$yyes1)) + 
+                                     as.numeric(as.integer(tele_norm_cl5_test$yyes2)) + 
+                                     as.numeric(as.character(tele_norm_cl5_test$yyes3))) > 1, 1, 0 )
+
+CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes4, prop.chisq=FALSE)
+
+```
+
+
+
+
+
+
+
+
 
 
 
