@@ -100,7 +100,7 @@ reg1 <- glm(yyes ~ ., data = tele_norm_cl1_train)
 reg1 <-  step(reg1, direction = "backward")
   #Optimizing the regression
 
-tele_norm_cl1_test$yyes1 <- NULL
+tele_norm_cl1_test$yyes <- NULL
 tele_norm_cl1_test$yyes1 <- predict(reg1, newdata = tele_norm_cl1_test, type = "response")
 tele_norm_cl1_test$yyes1 <- ifelse(tele_norm_cl1_test$yyes1 > 0.5, 1, 0)
   #Create yyes column in test data set with the predictions from the regression
@@ -122,7 +122,7 @@ reg2 <- glm(yyes ~ ., data = tele_norm_cl2_train)
 reg2 <-  step(reg2, direction = "backward")
   #Optimizing
 
-tele_norm_cl2_test$yyes1 <- NULL
+tele_norm_cl2_test$yyes <- NULL
 tele_norm_cl2_test$yyes1 <- predict(reg2, newdata = tele_norm_cl2_test, type = "response")
 tele_norm_cl2_test$yyes1 <- ifelse(tele_norm_cl2_test$yyes1 > 0.5, 1, 0)
 
@@ -142,7 +142,7 @@ tele_norm_cl5_test <- tele_norm_cl5[test_cl5,]
 reg5 <- glm(yyes ~ ., data = tele_norm_cl5_train)
 reg5 <-  step(reg5, direction = "backward")
 
-tele_norm_cl5_test$yyes1 <- NULL
+tele_norm_cl5_test$yyes <- NULL
 tele_norm_cl5_test$yyes1 <- predict(reg5, newdata = tele_norm_cl5_test, type = "response")
 tele_norm_cl5_test$yyes1 <- ifelse(tele_norm_cl5_test$yyes1 > 0.5, 1, 0)
 
