@@ -252,8 +252,8 @@ confusionMatrix(as.factor(tele_norm_cl5_test$yyes3), as.factor(tele_norm_cl5_tes
 #CLUSTER 1
 tele_norm_cl1_test$yyes4 <- NULL
   #For debugging purposes
-tele_norm_cl1_test$yyes4 <- ifelse((as.numeric(as.integer(tele_norm_cl1_test$yyes1)) + 
-                                     as.numeric(as.integer(tele_norm_cl1_test$yyes2)) + 
+tele_norm_cl1_test$yyes4 <- ifelse((as.numeric(as.character(tele_norm_cl1_test$yyes1)) + 
+                                     as.numeric(as.character(tele_norm_cl1_test$yyes2)) + 
                                      as.numeric(as.character(tele_norm_cl1_test$yyes3))) > 1, 1, 0 )
 
   #If the sum of the three predictions is more than one, it means that two or more of those three predictors is one, and thus, we get a 1 in the final prediction
@@ -267,8 +267,8 @@ CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_test$yyes4, prop.chis
 
 #CLUSTER 2
 tele_norm_cl2_test$yyes4 <- NULL
-tele_norm_cl2_test$yyes4 <- ifelse((as.numeric(as.integer(tele_norm_cl2_test$yyes1)) + 
-                                     as.numeric(as.integer(tele_norm_cl2_test$yyes2)) + 
+tele_norm_cl2_test$yyes4 <- ifelse((as.numeric(as.character(tele_norm_cl2_test$yyes1)) + 
+                                     as.numeric(as.character(tele_norm_cl2_test$yyes2)) + 
                                      as.numeric(as.character(tele_norm_cl2_test$yyes3))) > 1, 1, 0 )
 
 CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_test$yyes4, prop.chisq=FALSE)
@@ -277,8 +277,8 @@ CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_test$yyes4, prop.chis
 
 #CLUSTER 5
 tele_norm_cl5_test$yyes4 <- NULL
-tele_norm_cl5_test$yyes4 <- ifelse((as.numeric(as.integer(tele_norm_cl5_test$yyes1)) + 
-                                     as.numeric(as.integer(tele_norm_cl5_test$yyes2)) + 
+tele_norm_cl5_test$yyes4 <- ifelse((as.numeric(as.character(tele_norm_cl5_test$yyes1)) + 
+                                     as.numeric(as.character(tele_norm_cl5_test$yyes2)) + 
                                      as.numeric(as.character(tele_norm_cl5_test$yyes3))) > 1, 1, 0 )
 
 CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes4, prop.chisq=FALSE)
