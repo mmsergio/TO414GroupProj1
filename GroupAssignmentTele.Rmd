@@ -157,6 +157,35 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes1, prop.chis
 
 
 ## Building a KNN Model
+
+```{r}
+tele_norm_cl1_train$yyes <- NULL
+tele_norm_cl1_trainlabels <- tele_norm_cl1[-test_cl1, "yyes"]
+tele_norm_cl1_knnprediction <- knn(train = tele_norm_cl1_train, test = tele_norm_cl1_test[-tele_norm_cl1_test$yyes1],
+                      cl = tele_norm_cl1_trainlabels, k=2)
+CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_knnprediction, prop.chisq=FALSE)
+
+tele_norm_cl1_test$yyes2 <- tele_norm_cl1_knnprediction
+
+#CLUSTER 2
+tele_norm_cl2_train$yyes <- NULL
+tele_norm_cl2_trainlabels <- tele_norm_cl2[-test_cl2, "yyes"]
+tele_norm_cl2_knnprediction <- knn(train = tele_norm_cl2_train, test = tele_norm_cl2_test[-tele_norm_cl2_test$yyes1],
+                      cl = tele_norm_cl2_trainlabels, k=5)
+CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_knnprediction, prop.chisq=FALSE)
+  #Again very bad results
+tele_norm_cl2_test$yyes2 <- tele_norm_cl2_knnprediction
+
+#CLUSTER 5
+tele_norm_cl5_train$yyes <- NULL
+tele_norm_cl5_trainlabels <- tele_norm_cl5[-test_cl5, "yyes"]
+tele_norm_cl5_knnprediction <- knn(train = tele_norm_cl5_train, test = tele_norm_cl5_test[-tele_norm_cl5_test$yyes1],
+                      cl = tele_norm_cl5_trainlabels, k=6)
+CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_knnprediction, prop.chisq=FALSE)
+tele_norm_cl5_test$yyes2 <- tele_norm_cl5_knnprediction
+```
+
+
 ## Building a Neural Net 
 
 ```{r}
