@@ -256,7 +256,7 @@ tele_norm_cl1_test$yyes4 <- ifelse((as.numeric(as.character(tele_norm_cl1_test$y
                                      as.numeric(as.character(tele_norm_cl1_test$yyes2)) + 
                                      as.numeric(as.character(tele_norm_cl1_test$yyes3))) > 1, 1, 0 )
 
-  #If the sum of the three predictions is more than one, it means that two or more of those three predictors is one, and thus, we get a 1 in the final prediction
+  #If the sum of the three predictions is more than 1, it means that two or more of those three predictors is one, and thus, we get a 1 in the final prediction
 
 CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_test$yyes4, prop.chisq=FALSE)
   #23% no está nada mal
