@@ -144,7 +144,7 @@ reg5 <-  step(reg5, direction = "backward")
 
 tele_norm_cl5_test$yyes <- NULL
 tele_norm_cl5_test$yyes1 <- predict(reg5, newdata = tele_norm_cl5_test, type = "response")
-tele_norm_cl5_test$yyes1 <- ifelse(tele_norm_cl5_test$yyes1 > 0.5, 1, 0)
+tele_norm_cl5_test$yyes1 <- ifelse(tele_norm_cl5_test$yyes1 > 0.55, 1, 0)
 
 tele_norm_cl5_testlabels <- tele_norm_cl5[test_cl5, "yyes"]
 
@@ -159,17 +159,22 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes1, prop.chis
 ## Building a KNN Model
 
 ```{r}
+#CLUSTER 1
+tele_norm_cl1_test$yyes2 <- NULL
 tele_norm_cl1_train$yyes <- NULL
 tele_norm_cl1_trainlabels <- tele_norm_cl1[-test_cl1, "yyes"]
+set.seed(12345)
 tele_norm_cl1_knnprediction <- knn(train = tele_norm_cl1_train, test = tele_norm_cl1_test[-tele_norm_cl1_test$yyes1],
-                      cl = tele_norm_cl1_trainlabels, k=2)
+                      cl = tele_norm_cl1_trainlabels, k=4)
 CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_knnprediction, prop.chisq=FALSE)
 
 tele_norm_cl1_test$yyes2 <- tele_norm_cl1_knnprediction
 
 #CLUSTER 2
 tele_norm_cl2_train$yyes <- NULL
+tele_norm_cl2_test$yyes2 <- NULL
 tele_norm_cl2_trainlabels <- tele_norm_cl2[-test_cl2, "yyes"]
+set.seed(12345)
 tele_norm_cl2_knnprediction <- knn(train = tele_norm_cl2_train, test = tele_norm_cl2_test[-tele_norm_cl2_test$yyes1],
                       cl = tele_norm_cl2_trainlabels, k=5)
 CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_knnprediction, prop.chisq=FALSE)
@@ -178,7 +183,9 @@ tele_norm_cl2_test$yyes2 <- tele_norm_cl2_knnprediction
 
 #CLUSTER 5
 tele_norm_cl5_train$yyes <- NULL
+tele_norm_cl5_test$yyes2 <- NULL
 tele_norm_cl5_trainlabels <- tele_norm_cl5[-test_cl5, "yyes"]
+set.seed(12345)
 tele_norm_cl5_knnprediction <- knn(train = tele_norm_cl5_train, test = tele_norm_cl5_test[-tele_norm_cl5_test$yyes1],
                       cl = tele_norm_cl5_trainlabels, k=6)
 CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_knnprediction, prop.chisq=FALSE)
@@ -191,7 +198,7 @@ tele_norm_cl5_test$yyes2 <- tele_norm_cl5_knnprediction
 ```{r}
 tele_norm_cl1_train$yyes <- tele_norm_cl1_trainlabels
   #Restore the yyes column
-
+set.seed(12345)
 neuralmod_cl1 <- neuralnet(yyes~., data=tele_norm_cl1_train)
 
 tele_norm_cl1_test$yyes3 <- predict(neuralmod_cl1, tele_norm_cl1_test)
