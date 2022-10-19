@@ -108,7 +108,7 @@ tele_norm_cl1_test$yyes1 <- ifelse(tele_norm_cl1_test$yyes1 > 0.5, 1, 0)
 tele_norm_cl1_testlabels <- tele_norm_cl1[test_cl1, "yyes"]
 
 CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_test$yyes1, prop.chisq=FALSE)
-  #Esto hay que revisarlo bien porque nos estamos dejando a mucha gente que compraria
+
 
 
 
@@ -129,7 +129,7 @@ tele_norm_cl2_test$yyes1 <- ifelse(tele_norm_cl2_test$yyes1 > 0.5, 1, 0)
 tele_norm_cl2_testlabels <- tele_norm_cl2[test_cl2, "yyes"]
 
 CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_test$yyes1, prop.chisq=FALSE)
-  #Revisar esto también
+
 
 
 
@@ -150,8 +150,6 @@ tele_norm_cl5_testlabels <- tele_norm_cl5[test_cl5, "yyes"]
 
 CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes1, prop.chisq=FALSE)
 
-
-  #En todas nos estamos dejando a mucha gente, no tiene pinta que esta forma de predecir sea muy buena
 ```
 
 
@@ -199,10 +197,10 @@ tele_norm_cl5_test$yyes2 <- tele_norm_cl5_knnprediction
 tele_norm_cl1_train$yyes <- tele_norm_cl1_trainlabels
   #Restore the yyes column
 set.seed(12345)
-neuralmod_cl1 <- neuralnet(yyes~., data=tele_norm_cl1_train)
+neuralmod_cl1 <- neuralnet(yyes~., data=tele_norm_cl1_train, hidden = c(3,1))
 
 tele_norm_cl1_test$yyes3 <- predict(neuralmod_cl1, tele_norm_cl1_test)
-tele_norm_cl1_test$yyes3 <- ifelse(tele_norm_cl1_test$yyes3 > 0.6, 1, 0)
+tele_norm_cl1_test$yyes3 <- ifelse(tele_norm_cl1_test$yyes3 > 0.7, 1, 0)
   #Add column with prediction
 
 CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_test$yyes3, prop.chisq=FALSE)
@@ -215,33 +213,34 @@ confusionMatrix(as.factor(tele_norm_cl1_test$yyes3), as.factor( tele_norm_cl1_te
 
 #CLUSTER 2
 tele_norm_cl2_train$yyes <- tele_norm_cl2_trainlabels
-
+set.seed(12345)
 neuralmod_cl2 <- neuralnet(yyes~., data=tele_norm_cl2_train)
 
 tele_norm_cl2_test$yyes3 <- predict(neuralmod_cl2, tele_norm_cl2_test)
-tele_norm_cl2_test$yyes3 <- ifelse(tele_norm_cl2_test$yyes3 > 0.5, 1, 0)
+tele_norm_cl2_test$yyes3 <- ifelse(tele_norm_cl2_test$yyes3 > 0.3, 1, 0)
 
 CrossTable(x = tele_norm_cl2_testlabels, y = tele_norm_cl2_test$yyes3, prop.chisq=FALSE)
 
 confusionMatrix(as.factor(tele_norm_cl2_test$yyes3), as.factor(tele_norm_cl2_testlabels), positive = "1")
-
+    #VERY BAD, THE 2 CLUSTER PROBABLY SHOULD NOT BE CALLED
+  #Adding more hidden layers and nodes does not improve that much, so I have not included them
 
 
 
 #CLUSTER 5
 tele_norm_cl5_train$yyes <- tele_norm_cl5_trainlabels
-
-neuralmod_cl5 <- neuralnet(yyes~., data=tele_norm_cl5_train)
+set.seed(12345)
+neuralmod_cl5 <- neuralnet(yyes~., data=tele_norm_cl5_train, hidden = c(3,1))
 
 tele_norm_cl5_test$yyes3 <- predict(neuralmod_cl5, tele_norm_cl5_test)
-tele_norm_cl5_test$yyes3 <- ifelse(tele_norm_cl5_test$yyes3 > 0.4, 1, 0)
+tele_norm_cl5_test$yyes3 <- ifelse(tele_norm_cl5_test$yyes3 > 0.5, 1, 0)
 
 CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes3, prop.chisq=FALSE)
 
 confusionMatrix(as.factor(tele_norm_cl5_test$yyes3), as.factor(tele_norm_cl5_testlabels), positive = "1")
 
+  #Improved but we have reached the maximum number of steps what should we do here?
 ```
-
 
 
 
@@ -259,9 +258,6 @@ tele_norm_cl1_test$yyes4 <- ifelse((as.numeric(as.character(tele_norm_cl1_test$y
   #If the sum of the three predictions is more than 1, it means that two or more of those three predictors is one, and thus, we get a 1 in the final prediction
 
 CrossTable(x = tele_norm_cl1_testlabels, y = tele_norm_cl1_test$yyes4, prop.chisq=FALSE)
-  #23% no está nada mal
-
-
 
 
 
@@ -285,6 +281,18 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes4, prop.chis
 
 ```
 
+## Conclusion section
+
+KNN is going to be the worse, basically will always predict 0 as almost every
+
+
+
+KNN va a ser el peor, muestra no todo el rato
+Best metric: false negative, 
+  maximize sensitivity 
+  
+  
+Choose model based on the profit of each
 
 
 
