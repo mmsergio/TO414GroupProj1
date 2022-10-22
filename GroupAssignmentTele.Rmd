@@ -78,7 +78,8 @@ tele_norm$cluster <- tele_clusters$cluster
 
 aggregate(data = tele_norm, yyes ~ cluster, mean)
   #Cluster 3 and 4 no need to build a regression, already reach the 16% threshold
-
+length(which(tele_norm$cluster == 3))
+length(which(tele_norm$cluster == 4))
 #Creating 3 new data sets for each cluster
 
 tele_norm_cl1 <- subset(tele_norm, cluster == 1)
@@ -158,7 +159,10 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes1, prop.chis
 
 ```{r}
 #CLUSTER 1
+tele_norm_cl1_test$yyes3 <- NULL
+tele_norm_cl1_test$yyes4 <- NULL
 tele_norm_cl1_test$yyes2 <- NULL
+  #Debbuging purposes
 tele_norm_cl1_train$yyes <- NULL
 tele_norm_cl1_trainlabels <- tele_norm_cl1[-test_cl1, "yyes"]
 set.seed(12345)
@@ -171,6 +175,8 @@ tele_norm_cl1_test$yyes2 <- tele_norm_cl1_knnprediction
 #CLUSTER 2
 tele_norm_cl2_train$yyes <- NULL
 tele_norm_cl2_test$yyes2 <- NULL
+tele_norm_cl2_test$yyes3 <- NULL
+tele_norm_cl2_test$yyes4 <- NULL
 tele_norm_cl2_trainlabels <- tele_norm_cl2[-test_cl2, "yyes"]
 set.seed(12345)
 tele_norm_cl2_knnprediction <- knn(train = tele_norm_cl2_train, test = tele_norm_cl2_test[-tele_norm_cl2_test$yyes1],
@@ -182,6 +188,8 @@ tele_norm_cl2_test$yyes2 <- tele_norm_cl2_knnprediction
 #CLUSTER 5
 tele_norm_cl5_train$yyes <- NULL
 tele_norm_cl5_test$yyes2 <- NULL
+tele_norm_cl5_test$yyes3 <- NULL
+tele_norm_cl5_test$yyes4 <- NULL
 tele_norm_cl5_trainlabels <- tele_norm_cl5[-test_cl5, "yyes"]
 set.seed(12345)
 tele_norm_cl5_knnprediction <- knn(train = tele_norm_cl5_train, test = tele_norm_cl5_test[-tele_norm_cl5_test$yyes1],
@@ -230,7 +238,7 @@ confusionMatrix(as.factor(tele_norm_cl2_test$yyes3), as.factor(tele_norm_cl2_tes
 #CLUSTER 5
 tele_norm_cl5_train$yyes <- tele_norm_cl5_trainlabels
 set.seed(12345)
-neuralmod_cl5 <- neuralnet(yyes~., data=tele_norm_cl5_train, hidden = c(3,1))
+neuralmod_cl5 <- neuralnet(yyes~., data=tele_norm_cl5_train, hidden = c(2,1))
 
 tele_norm_cl5_test$yyes3 <- predict(neuralmod_cl5, tele_norm_cl5_test)
 tele_norm_cl5_test$yyes3 <- ifelse(tele_norm_cl5_test$yyes3 > 0.5, 1, 0)
@@ -239,7 +247,7 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes3, prop.chis
 
 confusionMatrix(as.factor(tele_norm_cl5_test$yyes3), as.factor(tele_norm_cl5_testlabels), positive = "1")
 
-  #Improved but we have reached the maximum number of steps what should we do here?
+  #Improved 
 ```
 
 
@@ -281,19 +289,17 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes4, prop.chis
 
 ```
 
-## Conclusion section
+## Conclusion and profitability analysis
 
-KNN is going to be the worse, basically will always predict 0 as almost every
-
-
-
-KNN va a ser el peor, muestra no todo el rato
-Best metric: false negative, 
-  maximize sensitivity 
+  Firstly, given that a call costs 1 dollar and a successful call yields 6 dollars as revenue, 1/6 calls need to be successful to cover expenses, therefore the break-even point is going to be established in 16%. Moreover, there are no fixed costs so the average cost is going to equal the variable cost (price of making one call) and there is no need to take advantage of economies of scale or massively call to lower the average cost.That being said, the highest profit is going result from the highest repurchase ratio (true positives over total calls).
   
+  After successfully clustering the data, two of the clusters exceed the break-even point (16%). As a consequence, these two groups of customers are profitable, and all clients within them should be called as more than 16% of them will be willing to repurchase. These two clusters are shown as number 3 and 4, with a repurchase rate of 20% and 64% respectively. Regarding the profitability of massively calling the clients in Cluster 3, 11519 calls would be performed with a total cost of $ 11519, but given than 20% are going to be successful, this leads to a total revenue of 13823 and a profit of 2304. Secondly, only 1518 call are needed to fully cover cluster 4 and with a 64% repurchase rate, the revenues are 5829, resulting in 4311 of profit. 
   
-Choose model based on the profit of each
-
+  Next, the other three clusters (1,2 and 5) remain unprofitable, so now we need to predict who to call within these Clusters to have a successful sale. The KNN prediction is almost useless in this situation: as in these clusters very few people actually buy, the prediction will virtually every time yield 0 (client does not repurchase) due to the soaring number of neighbors who do not buy. Consequently, the joint prediction is going to be greatly influenced by KNN results which are not accurate enough, questioning also the validity of this prediction. 
+  
+  All of our predictions have been created to maximize its precision. But one of the most critical issues, is the high number of false negatives (potential clients that we do not identify as such) that we have in all of the models (very low sensitivity). But trying to have those clients as true positives, increases the number of false positives as well, and reduces the successful calls over total calls ratio. As making more calls does not reduce the average cost, an effort to capture those false negatives reduces our precision and thus profitability.
+  
+  Mention that cluster 2 should not be called as it is not worth it. 
 
 
 
