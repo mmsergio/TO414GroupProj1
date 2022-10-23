@@ -38,6 +38,8 @@ tele$pdays <- NULL
 
 str(tele)
 summary(tele)
+
+table(tele$y)
 ```
 
 ## Getting Data Ready for Analysis
@@ -293,17 +295,38 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes4, prop.chis
 
   Firstly, given that a call costs 1 dollar and a successful call yields 6 dollars as revenue, 1/6 calls need to be successful to cover expenses, therefore the break-even point is going to be established in 16%. Moreover, there are no fixed costs so the average cost is going to equal the variable cost (price of making one call) and there is no need to take advantage of economies of scale or massively call to lower the average cost.That being said, the highest profit is going result from the highest repurchase ratio (true positives over total calls).
   
-  After successfully clustering the data, two of the clusters exceed the break-even point (16%). As a consequence, these two groups of customers are profitable, and all clients within them should be called as more than 16% of them will be willing to repurchase. These two clusters are shown as number 3 and 4, with a repurchase rate of 20% and 64% respectively. Regarding the profitability of massively calling the clients in Cluster 3, 11519 calls would be performed with a total cost of $ 11519, but given than 20% are going to be successful, this leads to a total revenue of 13823 and a profit of 2304. Secondly, only 1518 call are needed to fully cover cluster 4 and with a 64% repurchase rate, the revenues are 5829, resulting in 4311 of profit. 
+  The initial situation is the following: 41188 calls have been made, while only 4640 have resulted in a sale, leading to 27840 in revenues, but -13348 in profit. As the 16% threshold has not been reached, the call center is operating with substantial loses. The following analysis aims to improve the financial situation of the call center by predicting those clients that need to be called to have a sale. 
+  
+  After successfully clustering the data, two of the clusters exceed the break-even point (16%). As a consequence, these two groups of customers are profitable, and all clients within them should be called as more than 16% of them will be willing to repurchase. These two clusters are shown as number 3 and 4, with a repurchase rate of 20% and 64% respectively. Regarding the profitability of massively calling the clients in Cluster 3, 11519 calls would be performed with a total cost of $ 11519, but given than 19.54% are going to be successful, this leads to a total revenue of 13494 and a profit of 1975. Secondly, only 1518 call are needed to fully cover cluster 4 and with a 64% repurchase rate, the revenues are 5802, resulting in 4284 of profit. Only focusing on this clusters would make the call center profitable, but we can still predict those in the unprofitable clusters that will be willing to buy. 
   
   Next, the other three clusters (1,2 and 5) remain unprofitable, so now we need to predict who to call within these Clusters to have a successful sale. The KNN prediction is almost useless in this situation: as in these clusters very few people actually buy, the prediction will virtually every time yield 0 (client does not repurchase) due to the soaring number of neighbors who do not buy. Consequently, the joint prediction is going to be greatly influenced by KNN results which are not accurate enough, questioning also the validity of this prediction. 
   
   All of our predictions have been created to maximize its precision. But one of the most critical issues, is the high number of false negatives (potential clients that we do not identify as such) that we have in all of the models (very low sensitivity). But trying to have those clients as true positives, increases the number of false positives as well, and reduces the successful calls over total calls ratio. As making more calls does not reduce the average cost, an effort to capture those false negatives reduces our precision and thus profitability.
   
-  Mention that cluster 2 should not be called as it is not worth it. 
+  In order to maximize our profits, we need to consider how much money and calls we want to be spending on each cluster. Given that cluster 2 was the least profitable just by looking at the 5% of success in cluster 2 and how badly the models performed at predicting the few people that did buy (very low probabilities, the prediction is almost useless), it is not worth including in our calls. Our KNN, Logistic Regression, and Neural Net models all predict under 7 people actually buying out of the around 200 that did buy. Therefore, even if a small portion of cluster 2 are buying, with our models, we can not accurately predict who among those people are willing to buy with enough accuracy, so according to our strategy it's not advisable to call people in cluster 2 at all. 
+  
+  The Logistic Regression has been particularly useful to identify buyers in cluster 1 (92% precision): 13 calls would be made, and 12 are going to be successful, meaning 59 in profits. Even though the number is not particularly high, we are making profit from a cluster with less than a 3% sales rate. It is worth mentioning that the regressions have been optimized, but they do not include interactions or squared terms, which can potentially improve the predictive capacity of the model.Performance in cluster 5 is worse, 5 calls would be made, 3 of them being a sale, yielding 13 in profits. The total profit is 72 dollars.
+  
+  The Neural Network works fine as well, but does not yield as much profits as using the Linear Regression on cluster 1 and 5 does (actually better results for cluster 5). The profits are the following: 19 calls, 60 in revenues and 41 in profit for cluster 1; 31 calls, 48 in revenues and 17 in profits for cluster 5; a total of 58 in profit. We believe the data is not complex enough to use a NN with multiple hidden layers (which by the way takes a long time to run, so it was difficult for us to test) and that ultimately the Logistic Regression is superior. 
+  
+  Also, and as it has been mentioned before, the performance of the combined prediction is weak, probably as it is biased by the KNN results. Profits using this method are considerably low when compared to the Logistic Regression: 14 for cluster 5 and 44 for cluster 1. 
+  
+  Sticking to the Logistic Regression predictions and the clustering the situation can be described as the following: 
+  
+  - Cluster 1   - Calls = 13       - Sales = 12   - Revenues = 72    - Profit = 59
+  - Cluster 3   - Calls = 11519    - Sales = 2249 - Revenues = 13494 - Profit = 1975   
+  - Cluster 4   - Calls = 1518     - Sales = 967  - Revenues = 5802  - Profit = 4284
+  - Cluster 5   - Calls = 5        - Sales = 3    - Revenues = 18    - Profit = 13
 
 
-
-
+  - Total Profit = 6301
+  - Total Calls = 13054
+  - Total Sales = 3231
+  - Total Revenues = 19386
+  
+  - Sales / Calls = 24.74%
+  
+  Describe the imporvement
 
 
 
