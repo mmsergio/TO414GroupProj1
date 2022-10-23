@@ -1,6 +1,7 @@
+---
 title: "HW6 Telemarketing"
-author: "Group"
-date: "3/22/2020"
+author: "Group: Sergio Martinez, Arturo Soto Gonzalez, Sergio Mendez, Rodrigo Coello de Portugal Magallon, Jared Zwycewicz"
+date: "10/23/2022"
 output:
   html_document:
     toc: true
