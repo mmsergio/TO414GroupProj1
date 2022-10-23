@@ -254,7 +254,7 @@ confusionMatrix(as.factor(tele_norm_cl5_test$yyes3), as.factor(tele_norm_cl5_tes
 
 
 
-## Building a Join Prediction
+## Building a Joint Prediction
 ```{r}
 #Now we will use the predictions from the previous tests to build a joint prediction
 
@@ -291,7 +291,7 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes4, prop.chis
 
 ```
 
-## Conclusion and profitability analysis
+## Conclusion and Profitability Analysis
 
   Firstly, given that a call costs 1 dollar and a successful call yields 6 dollars as revenue, 1/6 calls need to be successful to cover expenses, therefore the break-even point is going to be established in 16%. Moreover, there are no fixed costs so the average cost is going to equal the variable cost (price of making one call) and there is no need to take advantage of economies of scale or massively call to lower the average cost.That being said, the highest profit is going result from the highest repurchase ratio (true positives over total calls).
   
@@ -326,7 +326,7 @@ CrossTable(x = tele_norm_cl5_testlabels, y = tele_norm_cl5_test$yyes4, prop.chis
   
   - Sales / Calls = 24.74%
   
-  Describe the imporvement
+  When comparing how the call center runs its calls before to the targeted calling we are suggesting, we can see the improvement in profits and efficiency by clustering and targeting only the profitable clusters. On the method we started with there were 36,548 calls on the data set that didn't buy and 4,640 sales out of the 41,188 calls made. When calling everyone, the call center was operating at a loss since the sales only amounted to $ 27,840 in sales with $ 36,548 expenses on calling everyone. With the improved clustered targeting method, we improved upon our revenue by making $ 6,301, which is a significant increase in profit and overall is more efficient than calling everyone. 
 
 
 
