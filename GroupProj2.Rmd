@@ -1,0 +1,90 @@
+---
+title: "Project2"
+author: "Group 14"
+date: '2022-10-30'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Introduction and business problem
+
+  The selected data sets displays information about the client profile of customers in a telecommunications firm. This information includes demographic data about the client, data regarding payments and billing, information about the services that client has received and finally, whether the client has renewed its contract with the firm or not (Churn variable). An appropriate treatment of this information is vital to any telecommunications company as it has the potential to point out how to boost retention rate. Interesting business questions that arise given the dataset include: Which profile are we retaining and who is leaving the subscription? How can we improve the retention rate? Is there any way to increase consumer loyalty? Is there any particular client profile that is worth and feasible to target?  Can we determine if a recent client is going to renovate its subscription once he is in our company? How can we make the client do so?
+
+## Data cleaning
+
+```{r}
+library(neuralnet)
+library(gmodels)
+library(caret)
+library(class)
+
+
+clients <- read.csv("ClientsChurn.csv")
+str(clients)
+summary(clients)
+  #Make factors
+  #We need to decide how to deal with the NAs in the Total Charges column
+
+
+clients$customerID <- NULL
+  #ID is not needed
+clients$gender <- as.factor(clients$gender)
+clients$SeniorCitizen <- as.factor(clients$SeniorCitizen)
+
+clients$Partner <- ifelse(clients$Partner == "Yes", 1, 0)
+clients$Partner <- as.factor(clients$Partner)
+
+clients$Dependents <- ifelse(clients$Dependents == "Yes", 1, 0)
+clients$Dependents <- as.factor(clients$Dependents)
+
+clients$PhoneService <- ifelse(clients$PhoneService == "Yes", 1, 0)
+clients$PhoneService <- as.factor(clients$PhoneService)
+
+clients$MultipleLines <- as.factor(clients$MultipleLines)
+clients$InternetService <- as.factor(clients$InternetService)
+clients$OnlineSecurity <- as.factor(clients$OnlineSecurity)
+clients$OnlineBackup <- as.factor(clients$OnlineBackup)
+clients$DeviceProtection <- as.factor(clients$DeviceProtection)
+clients$TechSupport <- as.factor(clients$TechSupport)
+clients$StreamingMovies <- as.factor(clients$StreamingMovies)
+clients$StreamingTV <- as.factor(clients$StreamingTV)
+clients$Contract <- as.factor(clients$Contract)
+
+clients$PaperlessBilling <- ifelse(clients$PaperlessBilling == "Yes", 1, 0)
+clients$PaperlessBilling <- as.factor(clients$PaperlessBilling)
+
+clients$Churn <- ifelse(clients$Churn == "Yes", 1, 0)
+clients$Churn <- as.factor(clients$Churn)
+
+clients$PaymentMethod <- as.factor(clients$PaymentMethod)
+
+str(clients)
+summary(clients)
+```
+
+## Logistic Regression
+
+```{r}
+#Extract test and train datasets
+test <- sample(1:nrow(clients), 2000)
+clients_train <- clients[-test,]
+clients_test <- clients[test,]
+
+reg1 <- glm(Churn ~ ., data = clients_train, family = "binomial")
+reg1 <- step(reg1, direction = "backward")
+
+clients_test$lrprediction <- NULL
+clients_test$lrprediction <- predict(reg1, newdata = clients_test, type = "response") 
+    #We need to revise this error
+clients_test$lrprediction <- ifelse(clients_test$lrprediction > 0.5, 1, 0)
+
+confusionMatrix(as.factor(clients_test$lrprediction), as.factor(clients_test$Churn), positive = "1")
+```
+## Clustering of clients
+
+```{r}
+
+```
+
