@@ -10,7 +10,17 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ## Introduction and business problem
 
-  The selected data sets displays information about the client profile of customers in a telecommunications firm. This information includes demographic data about the client, data regarding payments and billing, information about the services that client has received and finally, whether the client has renewed its contract with the firm or not (Churn variable). An appropriate treatment of this information is vital to any telecommunications company as it has the potential to point out how to boost retention rate. Interesting business questions that arise given the dataset include: Which profile are we retaining and who is leaving the subscription? How can we improve the retention rate? Is there any way to increase consumer loyalty? Is there any particular client profile that is worth and feasible to target?  Can we determine if a recent client is going to renovate its subscription once he is in our company? How can we make the client do so? Can we identify our most valuable clients by predicting its CLV? 
+    The selected data sets displays information about the client profile of customers in a telecommunications firm. This information includes demographic data about the client, data regarding payments and billing, information about the services that the client has received and finally, whether the client has renewed its contract with the firm or not (Churn variable). In this scenario the Churn variable is our response variable and we will analyze what factors affect it the most. An appropriate treatment of this information is vital to any telecommunications company as it has the potential to point out how to boost retention rate. Interesting business questions that arise given the dataset include: 
+  - Which profile are we retaining and who is leaving the subscription? 
+  - How can we improve the retention rate? 
+  - Is there any way to increase consumer loyalty? 
+  - Is there any particular client profile that is worth and feasible to target?  
+  - Can we determine if a recent client is going to renovate its subscription once he is in our company? How can we make the client do so? 
+  - Can we identify our most valuable clients by predicting its CLV? 
+  - What factors tend to make clients decided NOT to renew their subscription?
+  - Given the data analysis, what changes should be made in order to retain (and increase) client rate?
+
+URL to dataset: https://www.kaggle.com/datasets/blastchar/telco-customer-churn
 
 ## Data cleaning
 
