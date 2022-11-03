@@ -30,6 +30,7 @@ library(neuralnet)
 library(gmodels)
 library(caret)
 library(class)
+library(corrplot)
 
 clients <- read.csv("ClientsChurn.csv")
 str(clients)
@@ -70,8 +71,12 @@ clients$Churn <- as.factor(clients$Churn)
 
 clients$PaymentMethod <- as.factor(clients$PaymentMethod)
 
+clients$TotalCharges <- ifelse(is.na(clients$TotalCharges), median(clients$TotalCharges, na.rm = TRUE), clients$TotalCharges)
+
 str(clients)
 summary(clients)
+
+
 ```
 
 ## Logistic Regression
