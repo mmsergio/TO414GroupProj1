@@ -161,6 +161,16 @@ table(SVMprediction, clients_test$Churn)
 #Dataset with all 5 predictions
 
 allpredictions <- data.frame(lrprediction, KNNprediction, ann_pred, SVMprediction, treepred, clients_testlabels)
+summary(allpredictions)
+combined_test_set <- sample(1:nrow(allpredictions), 0.7*nrow(allpredictions)) 
+combined_train <- allpredictions[-combined_test_set, ]
+combined_test <- allpredictions[combined_test_set,]
+combined_dtree <- C5.0(as.factor(clients_testlabels) ~., data = combined_train)
+plot(combined_dtree)
+combined_pred <- predict(combined_dtree, combined_test)
+CrossTable(combined_pred, combined_test$clients_testlabels)
+combined_labels <- combined_test$clients_testlabels
+confusionMatrix(as.factor(combined_pred), as.factor(combined_labels))
 
 ```
 
