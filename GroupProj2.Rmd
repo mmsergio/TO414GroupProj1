@@ -167,6 +167,12 @@ allpredictions <- data.frame(lrprediction, KNNprediction, ann_pred, SVMpredictio
 ## Clustering of clients
 
 ```{r}
+set.seed(7593)
+clients_z <- as.data.frame(lapply(clients_norm, scale))
+clients_clusters <- kmeans(clients_norm, 5)
 
+clients_norm$cluster <- clients_clusters$cluster
+
+clients_clusters$centers
 ```
 
