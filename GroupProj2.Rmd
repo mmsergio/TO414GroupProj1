@@ -106,7 +106,8 @@ confusionMatrix(as.factor(lrprediction), as.factor(clients_test$Churn), positive
 ## KNN 
 
 ```{r}
-clients_train$Churn <- NULL
+
+
 ```
 
 ## Neural Net
