@@ -90,12 +90,11 @@ clients_test <- clients[test,]
 reg1 <- glm(Churn ~ ., data = clients_train, family = "binomial")
 reg1 <- step(reg1, direction = "backward")
 
-clients_test$lrprediction <- NULL
-clients_test$lrprediction <- predict(reg1, newdata = clients_test, type = "response") 
+lrprediction <- predict(reg1, newdata = clients_test, type = "response") 
     #We need to revise this error
-clients_test$lrprediction <- ifelse(clients_test$lrprediction > 0.5, 1, 0)
+lrprediction <- ifelse(clients_test$lrprediction > 0.5, 1, 0)
 
-confusionMatrix(as.factor(clients_test$lrprediction), as.factor(clients_test$Churn), positive = "1")
+confusionMatrix(as.factor(lrprediction), as.factor(clients_test$Churn), positive = "1")
 ```
 
 ## KNN 
