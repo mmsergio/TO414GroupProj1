@@ -126,7 +126,14 @@ confusionMatrix(as.factor(KNNprediction), as.factor(clients_testlabels))
 ## Neural Net
 
 ```{r}
-
+library(neuralnet)
+client_test_labels <- clients_norm[test, "Churn1"]
+set.seed(12345)
+neural_model <- neuralnet(Churn1~., data=clients_train)
+ann_pred <- predict(neural_model, newdata = clients_test)
+ann_pred <- ifelse(ann_pred > 0.41, 1, 0)
+CrossTable(x = ann_pred, y = clients_test$Churn, prop.chisq=FALSE)
+confusionMatrix(as.factor(ann_pred), as.factor(client_test_labels), positive = "1")
 ```
 
 ## Decision Tree
