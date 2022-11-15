@@ -93,21 +93,34 @@ clients_test <- clients_norm[test,]
 ## Logistic Regression
 
 ```{r}
-reg1 <- glm(Churn ~ ., data = clients_train, family = "binomial")
+reg1 <- glm(Churn1 ~ ., data = clients_train, family = "binomial")
 reg1 <- step(reg1, direction = "backward")
 
-lrprediction <- predict(reg1, newdata = clients_test, type = "response") 
-    #We need to revise this error
-lrprediction <- ifelse(clients_test$lrprediction > 0.5, 1, 0)
+lrprediction <- predict(reg1, newdata = clients_test, type = "response")
+lrprediction <- ifelse(lrprediction > 0.5, 1, 0)
 
-confusionMatrix(as.factor(lrprediction), as.factor(clients_test$Churn), positive = "1")
+confusionMatrix(as.factor(lrprediction), as.factor(clients_test$Churn1), positive = "1")
 ```
 
 ## KNN 
 
 ```{r}
-clients_trainlabels <- tele_norm[-test, "yyes"]
+clients_trainlabels <- clients_norm[-test, "Churn1"]
+clients_train$Churn1 <- NULL
 
+clients_testlabels <- clients_norm[test, "Churn1"]
+clients_test$Churn1 <- NULL
+
+set.seed(7593)
+KNNprediction <- knn(train = clients_train, test = clients_test,
+                      cl = clients_trainlabels, k=sqrt(nrow(clients_train)))
+
+clients_train$Churn1 <- clients_trainlabels
+clients_test$Churn1 <- clients_testlabels
+  #I restore the Churn column in the train and test dataset
+
+CrossTable(x = clients_testlabels,y= KNNprediction,prop.chisq=FALSE)
+confusionMatrix(as.factor(KNNprediction), as.factor(clients_testlabels))
 ```
 
 ## Neural Net
@@ -125,6 +138,13 @@ clients_trainlabels <- tele_norm[-test, "yyes"]
 ## SVM
 
 ```{r}
+
+```
+
+## Stacked model
+```{r}
+#Dataset with all 5 predictions
+
 
 ```
 
