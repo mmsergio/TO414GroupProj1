@@ -76,7 +76,13 @@ clients$TotalCharges <- ifelse(is.na(clients$TotalCharges), median(clients$Total
 str(clients)
 summary(clients)
 
+clientss <- as.data.frame(model.matrix(~.-1,clients))
 
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+clients_norm <- as.data.frame(lapply(clientss, normalize))
 ```
 
 ## Logistic Regression
@@ -100,7 +106,7 @@ confusionMatrix(as.factor(lrprediction), as.factor(clients_test$Churn), positive
 ## KNN 
 
 ```{r}
-
+clients_train$Churn <- NULL
 ```
 
 ## Neural Net
