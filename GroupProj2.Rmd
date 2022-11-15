@@ -83,16 +83,16 @@ normalize <- function(x) {
 }
 
 clients_norm <- as.data.frame(lapply(clientss, normalize))
+
+set.seed(7593)
+test <- sample(1:nrow(clients_norm), 2000)
+clients_train <- clients_norm[-test,]
+clients_test <- clients_norm[test,]
 ```
 
 ## Logistic Regression
 
 ```{r}
-#Extract test and train datasets
-test <- sample(1:nrow(clients), 2000)
-clients_train <- clients[-test,]
-clients_test <- clients[test,]
-
 reg1 <- glm(Churn ~ ., data = clients_train, family = "binomial")
 reg1 <- step(reg1, direction = "backward")
 
@@ -106,7 +106,7 @@ confusionMatrix(as.factor(lrprediction), as.factor(clients_test$Churn), positive
 ## KNN 
 
 ```{r}
-
+clients_trainlabels <- tele_norm[-test, "yyes"]
 
 ```
 
