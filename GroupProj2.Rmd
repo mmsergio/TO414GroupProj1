@@ -97,6 +97,31 @@ clients_test$lrprediction <- ifelse(clients_test$lrprediction > 0.5, 1, 0)
 
 confusionMatrix(as.factor(clients_test$lrprediction), as.factor(clients_test$Churn), positive = "1")
 ```
+
+## KNN 
+
+```{r}
+
+```
+
+## Neural Net
+
+```{r}
+
+```
+
+## Decision Tree
+
+```{r}
+
+```
+
+## SVM
+
+```{r}
+
+```
+
 ## Clustering of clients
 
 ```{r}
