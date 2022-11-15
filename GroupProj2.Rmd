@@ -139,7 +139,12 @@ confusionMatrix(as.factor(ann_pred), as.factor(client_test_labels), positive = "
 ## Decision Tree
 
 ```{r}
-
+library(C50)
+treemod <- C5.0(as.factor(Churn1) ~., data = clients_train)
+clients_testlabels <- clients_test$Churn1
+treepred <- predict(treemod, clients_test)
+confusionMatrix(as.factor(treepred), as.factor(clients_testlabels))
+## comment
 ```
 
 ## SVM
