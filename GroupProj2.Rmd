@@ -151,7 +151,7 @@ confusionMatrix(as.factor(treepred), as.factor(clients_testlabels))
 
 ```{r}
 library(kernlab)
-clients_SVM <- ksvm(as.factor(Churn)~., data = clients_train, kernel = "vanilladot")
+clients_SVM <- ksvm(as.factor(Churn1)~., data = clients_train, kernel = "vanilladot")
 SVMprediction <- predict(clients_SVM, clients_test)
 table(SVMprediction, clients_test$Churn)
 ```
@@ -160,6 +160,7 @@ table(SVMprediction, clients_test$Churn)
 ```{r}
 #Dataset with all 5 predictions
 
+allpredictions <- data.frame(lrprediction, KNNprediction, ann_pred, SVMprediction, treepred, clients_testlabels)
 
 ```
 
