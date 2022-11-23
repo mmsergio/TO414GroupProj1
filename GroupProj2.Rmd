@@ -31,6 +31,8 @@ library(gmodels)
 library(caret)
 library(class)
 library(corrplot)
+library(C50)
+library(kernlab) 
 
 clients <- read.csv("ClientsChurn.csv")
 str(clients)
@@ -72,25 +74,40 @@ clients$Churn <- as.factor(clients$Churn)
 clients$PaymentMethod <- as.factor(clients$PaymentMethod)
 
 clients$TotalCharges <- ifelse(is.na(clients$TotalCharges), median(clients$TotalCharges, na.rm = TRUE), clients$TotalCharges)
+  #The NA values (a very small number) have been converted to the median
 
 str(clients)
 summary(clients)
+  #All the variables but the numeric ones are made factors. Binary variables (yes or no) have been converted to 1 and 0
 
+```
+
+## Normalization and test/train dataframes
+```{r}
 clientss <- as.data.frame(model.matrix(~.-1,clients))
+  #Factors are turned into dummy variables
 
 normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
 
 clients_norm <- as.data.frame(lapply(clientss, normalize))
+  #Numeric variables are normalized
 
 set.seed(7593)
 test <- sample(1:nrow(clients_norm), 2000)
+  #Test made of 28% of all observations
+
 clients_train <- clients_norm[-test,]
 clients_test <- clients_norm[test,]
+
+clients_testlabels <- clients_norm[test, "Churn1"]
+clients_trainlabels <- clients_norm[-test, "Churn1"]
+
+  #Train and test data frames created. Labels for future use. 
 ```
 
-## Logistic Regression
+## Buildign a Logistic Regression
 
 ```{r}
 reg1 <- glm(Churn1 ~ ., data = clients_train, family = "binomial")
@@ -100,78 +117,99 @@ lrprediction <- predict(reg1, newdata = clients_test, type = "response")
 lrprediction <- ifelse(lrprediction > 0.5, 1, 0)
 
 confusionMatrix(as.factor(lrprediction), as.factor(clients_test$Churn1), positive = "1")
+
+  # Kappa = 0.47
+
+lrprediction <- predict(reg1, newdata = clients_test, type = "response")
+
+  #Original values are restored to build the stacked model afterwards
 ```
 
-## KNN 
+## Building a KNN prediction 
 
 ```{r}
-clients_trainlabels <- clients_norm[-test, "Churn1"]
 clients_train$Churn1 <- NULL
-
-clients_testlabels <- clients_norm[test, "Churn1"]
 clients_test$Churn1 <- NULL
 
 set.seed(7593)
 KNNprediction <- knn(train = clients_train, test = clients_test,
                       cl = clients_trainlabels, k=sqrt(nrow(clients_train)))
 
-clients_train$Churn1 <- clients_trainlabels
-clients_test$Churn1 <- clients_testlabels
-  #I restore the Churn column in the train and test dataset
-
 CrossTable(x = clients_testlabels,y= KNNprediction,prop.chisq=FALSE)
 confusionMatrix(as.factor(KNNprediction), as.factor(clients_testlabels))
+
+  # Kappa = 0.44
+
+clients_train$Churn1 <- clients_trainlabels
+clients_test$Churn1 <- clients_testlabels
+  #Churn columns is restored
 ```
 
 ## Neural Net
 
 ```{r}
-library(neuralnet)
-client_test_labels <- clients_norm[test, "Churn1"]
-set.seed(12345)
+set.seed(7593)
 neural_model <- neuralnet(Churn1~., data=clients_train)
-ann_pred <- predict(neural_model, newdata = clients_test)
-ann_pred <- ifelse(ann_pred > 0.41, 1, 0)
-CrossTable(x = ann_pred, y = clients_test$Churn, prop.chisq=FALSE)
-confusionMatrix(as.factor(ann_pred), as.factor(client_test_labels), positive = "1")
+ANNprediction <- predict(neural_model, newdata = clients_test)
+
+ANNprediction <- ifelse(ann_pred > 0.5, 1, 0)
+
+CrossTable(x = ANNprediction, y = clients_test$Churn, prop.chisq=FALSE)
+confusionMatrix(as.factor(ANNprediction), as.factor(clients_testlabels), positive = "1")
+
+  # Kappa = 0.47
+
+ANNprediction <- predict(neural_model, newdata = clients_test)
+  # Original values restored to create the stacked model
 ```
 
-## Decision Tree
+## Building a Decision Tree
 
 ```{r}
-library(C50)
 treemod <- C5.0(as.factor(Churn1) ~., data = clients_train)
-clients_testlabels <- clients_test$Churn1
 treepred <- predict(treemod, clients_test)
+
+plot(treemod)
+
 confusionMatrix(as.factor(treepred), as.factor(clients_testlabels))
-## comments
+  # Kappa = 0.38
 ```
 
-## SVM
+## Building a SVM prediction
 
 ```{r}
-library(kernlab)
-clients_SVM <- ksvm(as.factor(Churn1)~., data = clients_train, kernel = "vanilladot")
-SVMprediction <- predict(clients_SVM, clients_test)
-table(SVMprediction, clients_test$Churn)
+SVM_model <- ksvm(as.factor(Churn1)~., data = clients_train, kernel = "vanilladot")
+SVMprediction <- predict(SVM_model, clients_test)
+
+confusionMatrix(as.factor(SVMprediction), as.factor(clients_testlabels))
+
+  #Kappa = 0.45
 ```
 
-## Stacked model
+## Buidling the stacked model
 ```{r}
-#Dataset with all 5 predictions
-
 allpredictions <- data.frame(lrprediction, KNNprediction, ann_pred, SVMprediction, treepred, clients_testlabels)
 summary(allpredictions)
-combined_test_set <- sample(1:nrow(allpredictions), 0.7*nrow(allpredictions)) 
+
+colnames(allpredictions)[colnames(allpredictions) == "clients_testlabels"] ="Churn"
+  #Dataset with all 5 predictions and the lables that contain the true values for the test dataset
+set.seed(462)
+combined_test_set <- sample(1:nrow(allpredictions), 0.3*nrow(allpredictions)) 
+
 combined_train <- allpredictions[-combined_test_set, ]
 combined_test <- allpredictions[combined_test_set,]
-combined_dtree <- C5.0(as.factor(clients_testlabels) ~., data = combined_train)
-plot(combined_dtree)
-combined_pred <- predict(combined_dtree, combined_test)
-CrossTable(combined_pred, combined_test$clients_testlabels)
-combined_labels <- combined_test$clients_testlabels
-confusionMatrix(as.factor(combined_pred), as.factor(combined_labels))
 
+combined_dtree <- C5.0(as.factor(Churn) ~., data = combined_train)
+plot(combined_dtree)
+
+combined_pred <- predict(combined_dtree, combined_test)
+CrossTable(combined_pred, combined_test$Churn)
+confusionMatrix(as.factor(combined_pred), as.factor(combined_test$Churn))
+
+#It only takes the ANN prediction, we need to go through this 
+
+# Kappa = 0.48
+# Worse than others 
 ```
 
 ## Clustering of clients
@@ -184,5 +222,11 @@ clients_clusters <- kmeans(clients_norm, 5)
 clients_norm$cluster <- clients_clusters$cluster
 
 clients_clusters$centers
+  #We also need to interpret this, ask in class
+```
+## Tuning models
+
+```{r}
+
 ```
 
