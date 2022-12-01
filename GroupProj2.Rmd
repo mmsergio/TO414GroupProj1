@@ -225,11 +225,14 @@ confusionMatrix(as.factor(combined_pred), as.factor(combined_test$Churn))
 ```{r}
 set.seed(7593)
 clients_z <- as.data.frame(lapply(clients_norm, scale))
+clients_z$Churn1 <- NULL
 clients_clusters <- kmeans(clients_z, 5)
 
 clients_norm$cluster <- clients_clusters$cluster
 
 clients_clusters$centers
+
+aggregate(data = clients_norm, Churn1 ~ cluster, mean)
   #We also need to interpret this, ask in class
 ```
 ## Tuning models
