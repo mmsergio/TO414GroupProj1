@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
     The selected data sets displays information about the client profile of customers in a telecommunications firm. This information includes demographic data about the client, data regarding payments and billing, information about the services that the client has received and finally, whether the client has renewed its contract with the firm or not (Churn variable). In this scenario the Churn variable is our response variable and we will analyze what factors affect it the most. An appropriate treatment of this information is vital to any telecommunications company as it has the potential to point out how to boost retention rate. Interesting business questions that arise given the dataset include: 
 
 Questions for the first part:
-  - How can we improve the retention rate? (Predict, then engage those clients that we have identified that will remain, in retention promotions)
+  - How can we improve the retention rate? Financial problem (Predict, then engage those clients that we have identified that will remain, in retention promotions)
   
 Questions for the second part (from clustering onwards): 
   - Which profile are we retaining and who is leaving the subscription? (Comparison among clusters and profiles)  
@@ -27,13 +27,49 @@ Questions for the second part (from clustering onwards):
 URL to dataset: https://www.kaggle.com/datasets/blastchar/telco-customer-churn
 
 ## Maybe add some financials to make the case first question more interesting
+
+Month 1:
+  Clients = 7000
+  Monthly fix cost (rent, depreciation, wages) = 180000
+  Variable costs of supplying clients with services = 12
+  Total variable cost = 84000
   
-  Variable costs of supplying clients with services
-  Variable costs of engaging a client in consumer retention promotions
-  Average revenues per client
+  Variable costs of engaging a client in consumer retention promotions = 5
+  Total cost of massive promotion = 35000
+  
+  Total costs = 299000 
+  
+  Revenues = 456116.6
+  
+  Profit = 157116.6
+  
+Month 2:
+  Clients = 
+  Fix cost = 180000
+  Variable costs of supplying clients with services = 12
+  
+  
+  
   
   Instead of engaging all clients in these promotions, identify through model prediction those that we should engage and reach out to them
   Then compare financials
+
+```{r}
+
+totalrevenues = sum(clients$MonthlyCharges)
+totalrevenues
+totalcost = 299000
+aggregate(MonthlyCharges ~ Churn, data = clients, sum)
+
+  
+```
+The company has earned  456116.6 dollars this month from the subscription service
+Subtract fix and variable costs
+
+
+
+
+
 
 ## Data cleaning
 
