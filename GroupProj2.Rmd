@@ -225,12 +225,12 @@ confusionMatrix(as.factor(combined_pred), as.factor(combined_test$Churn))
 ```
 ## Comparison of Kappa and accuracy
 
-We just need to change this variables
+We just need to change this variables maybe add another thing such as sensitivity or sth
 
-|               | Logistic Reg   | KNN      | Neural Net  |    SVM     |   Decision Tree | Stacked Model |Stacked Model with Cost |
-|:--------------|:--------------:|:--------:|:-----------:|:----------:|:---------------:|:-------------:|:----------------------:|
-|   Kappa       |  0.29          |0.2       | 0.29        |     0.26   |    0.36         | 0.33          | 0.44                   |
-|  Sensitivity  |  0.22          |  0.13    |   0.23      | 0.2        | 0.33            | 0.27          | 0.6                    |
+|               | Logistic Reg   | KNN      | Neural Net  |    SVM     |   Decision Tree | Stacked Model |
+|:--------------|:--------------:|:--------:|:-----------:|:----------:|:---------------:|:-------------:|
+|   Kappa       |  0.29          |0.2       | 0.29        |     0.26   |    0.36         | 0.33          | 
+|  Accuracy     |  0.22          |  0.13    |   0.23      | 0.2        | 0.33            | 0.27          | 
 
 It will show up properly when knitted
 
