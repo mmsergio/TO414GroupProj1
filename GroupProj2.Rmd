@@ -196,7 +196,7 @@ confusionMatrix(as.factor(SVMprediction), as.factor(clients_testlabels))
 
 ## Buidling the stacked model
 ```{r}
-allpredictions <- data.frame(lrprediction, KNNprediction, ann_pred, SVMprediction, treepred, clients_testlabels)
+allpredictions <- data.frame(lrprediction, KNNprediction, ANNprediction, SVMprediction, treepred, clients_testlabels)
 summary(allpredictions)
 
 colnames(allpredictions)[colnames(allpredictions) == "clients_testlabels"] ="Churn"
@@ -225,13 +225,14 @@ confusionMatrix(as.factor(combined_pred), as.factor(combined_test$Churn))
 ```{r}
 set.seed(7593)
 clients_z <- as.data.frame(lapply(clients_norm, scale))
-clients_clusters <- kmeans(clients_z, 5)
+clients_clusters <- kmeans(clients_norm, 5)
 
 clients_norm$cluster <- clients_clusters$cluster
 
 clients_clusters$centers
   #We also need to interpret this, ask in class
 ```
+
 ## Tuning models
 
 ```{r}
