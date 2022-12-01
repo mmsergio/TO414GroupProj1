@@ -196,7 +196,7 @@ confusionMatrix(as.factor(SVMprediction), as.factor(clients_testlabels))
 
 ## Buidling the stacked model
 ```{r}
-allpredictions <- data.frame(lrprediction, KNNprediction, ann_pred, SVMprediction, treepred, clients_testlabels)
+allpredictions <- data.frame(lrprediction, KNNprediction, ANNprediction, SVMprediction, treepred, clients_testlabels)
 summary(allpredictions)
 
 colnames(allpredictions)[colnames(allpredictions) == "clients_testlabels"] ="Churn"
