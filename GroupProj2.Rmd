@@ -27,7 +27,7 @@ Questions for the second part (from clustering onwards):
 URL to dataset: https://www.kaggle.com/datasets/blastchar/telco-customer-churn
 
 ## Maybe add some financials to make the case first question more interesting
-  Fix costs of the infrastructure
+  
   Variable costs of supplying clients with services
   Variable costs of engaging a client in consumer retention promotions
   Average revenues per client
@@ -229,8 +229,8 @@ We just need to change this variables maybe add another thing such as sensitivit
 
 |               | Logistic Reg   | KNN      | Neural Net  |    SVM     |   Decision Tree | Stacked Model |
 |:--------------|:--------------:|:--------:|:-----------:|:----------:|:---------------:|:-------------:|
-|   Kappa       |  0.29          |0.2       | 0.29        |     0.26   |    0.36         | 0.33          | 
-|  Accuracy     |  0.22          |  0.13    |   0.23      | 0.2        | 0.33            | 0.27          | 
+|   Kappa       |  0.48          |0.45      | 0.48        |     0.47   |    0.43         | 0.41          | 
+|  Accuracy     |  0.8           |  0.79    |   0.81      | 0.8        | 0.8             | 0.8           | 
 
 It will show up properly when knitted
 
