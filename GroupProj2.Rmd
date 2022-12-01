@@ -256,6 +256,6 @@ aggregate(data = clients_norm, Churn1 ~ cluster, mean)
 ## Tuning models
 
 ```{r}
-
+#Create models on two highest clusters
 ```
 
