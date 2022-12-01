@@ -11,25 +11,29 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Introduction and business problem
 
     The selected data sets displays information about the client profile of customers in a telecommunications firm. This information includes demographic data about the client, data regarding payments and billing, information about the services that the client has received and finally, whether the client has renewed its contract with the firm or not (Churn variable). In this scenario the Churn variable is our response variable and we will analyze what factors affect it the most. An appropriate treatment of this information is vital to any telecommunications company as it has the potential to point out how to boost retention rate. Interesting business questions that arise given the dataset include: 
-    
-  - Which profile are we retaining and who is leaving the subscription? 
-  - How can we improve the retention rate? 
-  - Is there any way to increase consumer loyalty? 
-  - Is there any particular client profile that is worth and feasible to target?  
-  - Can we determine if a recent client is going to renovate its subscription once he is in our company? How can we make the client do so? 
-  - Can we identify our most valuable clients by predicting its CLV? 
+
+Questions for the first part:
+  - How can we improve the retention rate? (Predict, then engage those clients that we have identified that will remain, in retention promotions)
+  
+Questions for the second part (from clustering onwards): 
+  - Which profile are we retaining and who is leaving the subscription? (Comparison among clusters and profiles)  
   - What factors tend to make clients decided NOT to renew their subscription?
-  - Given the data analysis, what changes should be made in order to retain (and increase) client rate?
+  - Is there any particular client profile that is worth and feasible to target? (Best cluster in retention rate)  
+  - How can we make the client do so? (We can compare clusters with similar demographics, and then compare the chunk rate of both similar clusters and maybe propose changes to the services offered to the cluster that is not performing well based on what is working to the other cluster with demographic similarities)
+  - Can we identify our most valuable clients by predicting its CLV? (Maybe figure out something about the consumer lifetime value or something like that)
+
+
 
 URL to dataset: https://www.kaggle.com/datasets/blastchar/telco-customer-churn
->>>>>>> dd47e4fca6172d0766c44b4e3931add5e186d58c
 
-## Maybe add some financials to make the case more interesting
+## Maybe add some financials to make the case first question more interesting
   Fix costs of the infrastructure
   Variable costs of supplying clients with services
+  Variable costs of engaging a client in consumer retention promotions
   Average revenues per client
   
-
+  Instead of engaging all clients in these promotions, identify through model prediction those that we should engage and reach out to them
+  Then compare financials
 
 ## Data cleaning
 
@@ -219,17 +223,33 @@ confusionMatrix(as.factor(combined_pred), as.factor(combined_test$Churn))
 # Kappa = 0.41
 # Worse than others 
 ```
+## Comparison of Kappa and accuracy
+
+We just need to change this variables
+
+|               | Logistic Reg   | KNN      | Neural Net  |    SVM     |   Decision Tree | Stacked Model |Stacked Model with Cost |
+|:--------------|:--------------:|:--------:|:-----------:|:----------:|:---------------:|:-------------:|:----------------------:|
+|   Kappa       |  0.29          |0.2       | 0.29        |     0.26   |    0.36         | 0.33          | 0.44                   |
+|  Sensitivity  |  0.22          |  0.13    |   0.23      | 0.2        | 0.33            | 0.27          | 0.6                    |
+
+It will show up properly when knitted
 
 ## Clustering of clients
 
 ```{r}
 set.seed(7593)
 clients_z <- as.data.frame(lapply(clients_norm, scale))
+
 clients_clusters <- kmeans(clients_norm, 5)
+
+clients_z$Churn1 <- NULL
+clients_clusters <- kmeans(clients_z, 5)
 
 clients_norm$cluster <- clients_clusters$cluster
 
 clients_clusters$centers
+
+aggregate(data = clients_norm, Churn1 ~ cluster, mean)
   #We also need to interpret this, ask in class
 ```
 
