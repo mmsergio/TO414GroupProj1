@@ -230,7 +230,7 @@ We just need to change this variables maybe add another thing such as sensitivit
 |               | Logistic Reg   | KNN      | Neural Net  |    SVM     |   Decision Tree | Stacked Model |
 |:--------------|:--------------:|:--------:|:-----------:|:----------:|:---------------:|:-------------:|
 |   Kappa       |  0.48          |0.45      | 0.48        |     0.47   |    0.43         | 0.41          | 
-|  Accuracy     |  0.8           |  0.79    |   0.81      | 0.8        | 0.8             | 0.8           | 
+|  Accuracy     |  0.8           |  0.79    |   0.81      | 0.8        | 0.8             | 0.805           | 
 
 It will show up properly when knitted
 
