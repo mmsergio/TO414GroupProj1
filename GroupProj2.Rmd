@@ -27,50 +27,72 @@ Questions for the second part (from clustering onwards):
 URL to dataset: https://www.kaggle.com/datasets/blastchar/telco-customer-churn
 
 ## Maybe add some financials to make the case first question more interesting
+Assumptions taken into account:
+
+  In this case, we know both the number of clients in months 1 & 2 and the monthly charges for the services. Based on this, we can obtain the revenue of the company for these two months. Obviously, revenue decreases in Month 2 because there are less clients, some will leave the company, and our case does not take into account new clients subscribing to the company at the begining of Month 2. 
+
+  What we don't know, though, is the costs of the company, both fixed and variable costs. These may include the fixed cost of property plant and equipment, wages, as well as Research and Development, and variable cost of providing the service to the individual. The assumption of the costs will be based on the profit margin of a healthy telecommunications company, which, according to Investopedia, is around 12,5% in the telecommunication sector.
+
+  During Month 1, it will be assumed that the profit margin of the company is around 12,5%. The fixed and variable costs can be translated to the Month 2 (it will be the same) to calculate the new margin. Given that the telecom industry is very capital intensive, fixed costs are assumed to be high (230,000), while variable costs are around 6 times less than the average amount charged for the service (average = 64.5). When it comes to the promotion costs, these are punishing for the company, as they are losing potential revenue, but at the same time they increase the retention rate of the clients, so these are assumed to be 14.
+
+  It is assumed as well that the company is pushing this promotion to all clients regardless on whether the are going to renew or not. So offering the promotion to clients who are not willing to renovate next month is a waste of money for the firm. The aim of the first part of the project is to improve profitability by identifying which clients are going to stay the next month so the promotion can be targeted to them. It is key to note that if a client is willing to remain subscribed, but we don't send the promotion to them, they are going to leave the firm next month. 
+  
+  
+The breakdown of the calculation is below:
 
 Month 1:
+
   Clients = 7000
-  Monthly fix cost (rent, depreciation, wages) = 110000
-  Variable costs of supplying clients with services = 12
-  Total variable cost = 84000
-  
-  Variable costs of engaging a client in consumer retention promotions = 5
-  Total cost of massive promotion = 35000
-  
-  Total costs = 229000 
   
   Revenues = 456116.6
   
-  Profit = 227116.6
-
-
+  Monthly fixed costs (PPE, depreciation, SG&A, R&D) = 230,000
+  
+  Variable costs of supplying clients with services = 10.1
+  Total monthly variable costs without the promotion = 70,700
+  
+  Variable costs of engaging a client in consumer retention promotions = 14
+  Total cost of massive promotion = 98,000
+  
+  Total monthly variable costs = 168,700
+  
+  Total costs = 398,700 
+  
+  Profit = 57,416.6
+  
+  Profit margin = 12.59%
+  
 Month 2:
-  Clients = 1869
-  Fix cost = 110000
-  Variable costs of supplying clients with services = 12
-  Total variable cost = 22428
 
-  Total costs = 132438
+  Clients = 5174
   
-  Revenues = 139130.9
+  Revenues = 316985.8
+
+  Monthly fixed costs (PPE, depreciation, SG&A, R&D) = 230,000
   
-  Profits = 6692.9
+  Variable costs of supplying clients with services = 10.1
+  Total monthly variable costs = 52,257.4
+  
+  Total costs = 282,257.4
+
+  
+  Profit = 34,728.4
+  
+  Profit margin = 10.96%
+
+
+Now we will run our prediction models:
 
 ```{r}
-
 totalrevenues = sum(clients$MonthlyCharges)
 totalrevenues
 totalcost = 299000
 aggregate(MonthlyCharges ~ Churn, data = clients, sum)
+aggregate(MonthlyCharges ~ Churn, data = clients, mean)
+mean(clients$MonthlyCharges)
+nrow(clients[clients$Churn==0, ])
 nrow(clients[clients$Churn == 1,])
-  
 ```
-The company has earned  456116.6 dollars this month from the subscription service
-Subtract fix and variable costs
-
-
-
-
 
 
 ## Data cleaning
