@@ -1,8 +1,13 @@
 ---
-title: "Project2"
+title: "Project 2: Telecon Business"
 author: "Group 14"
 date: '2022-10-30'
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    highlight: tango
+    theme: united
 ---
 
 ```{r setup, include=FALSE}
@@ -10,41 +15,50 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ## Introduction and business problem
 
-    The selected data sets displays information about the client profile of customers in a telecommunications firm. This information includes demographic data about the client, data regarding payments and billing, information about the services that the client has received and finally, whether the client has renewed its contract with the firm or not (Churn variable). In this scenario the Churn variable is our response variable and we will analyze what factors affect it the most. An appropriate treatment of this information is vital to any telecommunications company as it has the potential to point out how to boost retention rate. Interesting business questions that arise given the dataset include: 
+   The selected data sets displays information about the client profile of customers in a telecommunications firm. This information includes demographic data about the client, data regarding payments and billing, information about the services that the client has received and finally, whether the client has renewed its contract with the firm or not (Churn variable). In this scenario the Churn variable is our response variable and we will analyze what factors affect it the most. An appropriate treatment of this information is vital to any telecommunications company as it has the potential to point out how to boost retention rate. Interesting business questions that arise given the dataset include: 
 
 Questions for the first part:
-  - How can we improve the retention rate? Financial problem (Predict, then engage those clients that we have identified that will remain, in retention promotions)
-  
-Questions for the second part (from clustering onwards): 
-  - Which profile are we retaining and who is leaving the subscription? (Comparison among clusters and profiles)  
-  - What factors tend to make clients decided NOT to renew their subscription?
-  - Is there any particular client profile that is worth and feasible to target? (Best cluster in retention rate)  
-  - How can we make the client do so? (We can compare clusters with similar demographics, and then compare the chunk rate of both similar clusters and maybe propose changes to the services offered to the cluster that is not performing well based on what is working to the other cluster with demographic similarities)
-  - Can we identify our most valuable clients by predicting its CLV? (Maybe figure out something about the consumer lifetime value or something like that)
 
+  - Improve the profitability of the Telecon: a financial problem
+  
+Questions for the second part:
+
+  - Which profile are we retaining and who is leaving the subscription? (Comparison among clusters and profiles) 
+  
+  - What factors tend to make clients decided NOT to renew their subscription?
+  
+  - Is there any particular client profile that is worth and feasible to target? (Best cluster in retention rate) 
+  
+  - How can we make the client do so? (We can compare clusters with similar demographics, and then compare the chunk rate of both similar clusters and maybe propose changes to the services offered to the cluster that is not performing well based on what is working to the other cluster with demographic similarities)
+  
+  - Can we identify our most valuable clients by predicting its CLV? (Maybe figure out something about the consumer lifetime value or something like that)
 
 
 URL to dataset: https://www.kaggle.com/datasets/blastchar/telco-customer-churn
 
-## Maybe add some financials to make the case first question more interesting
+
+# Part 1
+
+## Financials in the base scenario
+
 Assumptions taken into account:
 
   In this case, we know both the number of clients in months 1 & 2 and the monthly charges for the services. Based on this, we can obtain the revenue of the company for these two months. Obviously, revenue decreases in Month 2 because there are less clients, some will leave the company, and our case does not take into account new clients subscribing to the company at the begining of Month 2. 
 
   What we don't know, though, is the costs of the company, both fixed and variable costs. These may include the fixed cost of property plant and equipment, wages, as well as Research and Development, and variable cost of providing the service to the individual. The assumption of the costs will be based on the profit margin of a healthy telecommunications company, which, according to Investopedia, is around 12,5% in the telecommunication sector.
 
-  During Month 1, it will be assumed that the profit margin of the company is around 12,5%. The fixed and variable costs can be translated to the Month 2 (it will be the same) to calculate the new margin. Given that the telecom industry is very capital intensive, fixed costs are assumed to be high (230,000), while variable costs are around 6 times less than the average amount charged for the service (average = 64.5). When it comes to the promotion costs, these are punishing for the company, as they are losing potential revenue, but at the same time they increase the retention rate of the clients, so these are assumed to be 14.
+  During Month 1, it will be assumed that the profit margin of the company is around 12,5%. The fixed and variable costs can be translated to the Month 2 (it will be the same) to calculate the new margin. Given that the telecom industry is very capital intensive, fixed costs are assumed to be high (230,000), while variable costs are around 6 times less than the average amount charged for the service (average = 64.76). When it comes to the promotion costs, these are punishing for the company, as they are losing potential revenue, but at the same time they increase the retention rate of the clients, so these are assumed to be 14.
 
   It is assumed as well that the company is pushing this promotion to all clients regardless on whether the are going to renew or not. So offering the promotion to clients who are not willing to renovate next month is a waste of money for the firm. The aim of the first part of the project is to improve profitability by identifying which clients are going to stay the next month so the promotion can be targeted to them. It is key to note that if a client is willing to remain subscribed, but we don't send the promotion to them, they are going to leave the firm next month. 
   
   
 The breakdown of the calculation is below:
 
-Month 1:
+### Month 1:
 
   Clients = 7000
   
-  Revenues = 456116.6
+  **Revenues** = 453,320
   
   Monthly fixed costs (PPE, depreciation, SG&A, R&D) = 230,000
   
@@ -56,34 +70,39 @@ Month 1:
   
   Total monthly variable costs = 168,700
   
-  Total costs = 398,700 
+  **Total costs** = 398,700 
   
-  Profit = 57,416.6
+  **Profit** = 54620
   
-  Profit margin = 12.59%
+  Profit margin = 12.05%
   
-Month 2:
+### Month 2:
 
   Clients = 5174
   
-  Revenues = 316985.8
+  **Revenues** = 335,068.2
 
   Monthly fixed costs (PPE, depreciation, SG&A, R&D) = 230,000
   
   Variable costs of supplying clients with services = 10.1
   Total monthly variable costs = 52,257.4
   
-  Total costs = 282,257.4
+  **Total costs** = 282,257.4
+  
+  **Profit** = 52810.8
+  
+  Profit margin = 15.76%
 
-  
-  Profit = 34,728.4
-  
-  Profit margin = 10.96%
+
+TOTAL PROFITS IN THIS SCENARIO: 107,430.8
+
 
 
 Now we will run our prediction models:
 
+
 ```{r}
+clients <- read.csv("ClientsChurn.csv")
 totalrevenues = sum(clients$MonthlyCharges)
 totalrevenues
 totalcost = 299000
@@ -190,8 +209,6 @@ lrprediction <- ifelse(lrprediction > 0.5, 1, 0)
 
 confusionMatrix(as.factor(lrprediction), as.factor(clients_test$Churn1), positive = "1")
 
-  # Kappa = 0.48
-
 lrprediction <- predict(reg1, newdata = clients_test, type = "response")
 
   #Original values are restored to build the stacked model afterwards
@@ -275,24 +292,98 @@ combined_dtree <- C5.0(as.factor(Churn) ~., data = combined_train)
 plot(combined_dtree)
 
 combined_pred <- predict(combined_dtree, combined_test)
-CrossTable(combined_pred, combined_test$Churn)
+
 confusionMatrix(as.factor(combined_pred), as.factor(combined_test$Churn))
 
-#LR and tree, but I almost forced this case with this seed 
-
-# Kappa = 0.41
-# Worse than others 
 ```
+
+## Stacked model with cost matrix
+
+Now we will include a cost matrix to reduce the false positives. These false positives (we predict 1 when they are actually 0) are those clients that are initially willing to stay with the company but through our model, we predict that they are going to leave the firm so we do not bother to send the promotion to them. But as a consequence of not sending them the promotion, they will leave (we established this in the assumptions).
+
+```{r}
+costmatrix <- matrix(c(0,2,1,0), nrow = 2)
+
+combined_dtree2 <- C5.0(as.factor(Churn) ~ ., data = combined_train, costs = costmatrix)
+combined_pred2 <- predict(combined_dtree2, combined_test)
+
+confusionMatrix(as.factor(combined_pred2), as.factor(combined_test$Churn), positive = "1")
+```
+
+At the expense of sacrificing some accuracy, we manage to retain 8 extra clients that we initially identified they were leaving the firm (Churn 1) but they were in fact loyal customers (Churn 0). Initially, these 8 clients would not receive the promotion, but now they do, and will remain next month. Nevertheless, 16 clients that previously we correctly identified that they were going to leave the company (True Positives), now we predict they will remain (16 more false negatives). So we will send 16 additional predictions which are going to be worthless. Let's analayze the profitability change of adding the costs Matrix:
+
+16 + 8 = 24 additional promotions are sent                            24 * 14 = $336 additional costs during Month 1
+We get 8 more clients during Month 2                                  8 * 64.76 = $518.08 additional revenue
+
+As a conclusion, lowering the accuracy to capture those false positives has been profitable: the revenues during Month 2 of retaining those clients is way greater than the costs of sending more promotions during Month 1. 
+
+
 ## Comparison of Kappa and accuracy
 
-We just need to change this variables maybe add another thing such as sensitivity or sth
+The following section contains the values of accuracy and Kappa for each of rhe models
 
-|               | Logistic Reg   | KNN      | Neural Net  |    SVM     |   Decision Tree | Stacked Model |
-|:--------------|:--------------:|:--------:|:-----------:|:----------:|:---------------:|:-------------:|
-|   Kappa       |  0.48          |0.45      | 0.48        |     0.47   |    0.43         | 0.41          | 
-|  Accuracy     |  0.8           |  0.79    |   0.81      | 0.8        | 0.8             | 0.805         | 
+|               | Logistic Reg   | KNN      | Neural Net  |    SVM     |   Decision Tree | Stacked Model | Stacked Model with costs |
+|:--------------|:--------------:|:--------:|:-----------:|:----------:|:---------------:|:-------------:|:------------------------:|
+|   Kappa       |  0.48          |0.45      | 0.48        |     0.47   |    0.43         | 0.41          |            0.33          |
+|  Accuracy     |  0.8           |  0.79    |   0.81      | 0.8        | 0.8             | 0.80          |     0.79                 |
 
-It will show up properly when knitted
+
+## Profitability in the Second Scenario (predictions implemented)
+
+Now we will analyze the profitability of the company if a prediction model was used during Month 1 to identify clients willing to stay and target the promotion to them, rather than massively sending it to all the clients. 
+
+First we will scale the results to our original dataset. In our Stacked model with costs we have 600 clients, so the original dataset is 11.67 times greater. In the stacked model we send 523 promotions, 425 to clients who are actually going to stay and 98 to clients we have misidentified and will leave the company; this translates into 4958 successful promotions and 1144 wasted promotions. Also, in the prediction model, 27 clients who initially would remain in the company are not identified as loyal and do not receive the promotion, so they will end up leaving. In the original dataset that would be 315 lost clients. Lastly, the model has 50 true positives, clients that did not intend to renew so we do not send them the promotion, correctly. These would be 583 clients in the original dataset. Once the model has been scaled we can calculate the financials of the new scenario:
+
+
+### Month 1: 
+
+  Clients = 7000
+  
+  **Revenues** = 453,320
+  
+  Monthly fixed costs (PPE, depreciation, SG&A, R&D) = 230,000
+  
+  Variable costs of supplying clients with services = 10.1
+  Total monthly variable costs without the promotion = 70,700
+  
+  Variable costs of engaging a loyal client in consumer retention promotions = 14
+  Total cost of selective promotion = 14 * 4958 = 69,412
+  
+  Total monthly variable costs = 140,112
+  
+  **Total costs** = 370,112
+  
+  **Profit** = 83208
+  
+  Profit margin = 18.35%
+  
+  
+### Month 2:
+
+  Clients = 4958 (only those clients with Churn 0 that we sent the promotion to)
+  
+  **Revenues** = 321,080.1
+
+  Monthly fixed costs (PPE, depreciation, SG&A, R&D) = 230,000
+  
+  Variable costs of supplying clients with services = 10.1
+  Total monthly variable costs = 50,075.8
+  
+  **Total costs** = 280,075.8
+  
+  **Profit** = 41,004.3
+  
+  Profit margin = 12.77%
+
+TOTAL PROFITS IN THIS SCENARIO: 124,212.3
+
+
+When it comes to compare the results we seen an increase in profitability during Month 1 as less promotions are sent and thus the total costs are significantly reduced. But obviously during Month 2, we have less revenues as the prediction models are not able to capture all the clients that were willing to stay, so some did not receive the promotion and ended up leaving. 
+
+Actually, costs have been reduced during Month 1 by \$28,588 (398700-370112) and revenues decreased during Month 2 by \$13988.1 (335068.2-321080.1) so overall it can be said that implementing the prediction models has boosted the financial of the firm. Also the firm incurs in a lower cost during Month 2 as there are less clients, \$2181.6 less. 
+In fact profits in the company have increased by \$16781.5 (124212.3 - 107430.8).(It can also be computed like this: 28588 - 13988.1 + 2181.6)
+
+# Part 2
 
 ## Clustering of clients
 
