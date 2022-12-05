@@ -404,9 +404,183 @@ aggregate(data = clients_norm, Churn1 ~ cluster, mean)
   #We also need to interpret this, ask in class
 ```
 
-## Tuning models
+## Cluster Data Splitting
 
 ```{r}
 #Create models on two highest clusters
+cluster4 <- clients_norm[ clients_norm$cluster == 4, ]
+cluster4set <- sample(1:nrow(cluster4), 0.8*nrow(cluster4))
+cluster4train <- cluster4[cluster4set, ]
+cluster4test <- cluster4[-cluster4set, ]
+cluster4train$cluster <- NULL
+cluster4test$cluster <- NULL
+
+cluster3 <- clients_norm[ clients_norm$cluster == 3, ]
+cluster3set <- sample(1:nrow(cluster3), 0.8*nrow(cluster3))
+cluster3train <- cluster3[cluster3set, ]
+cluster3test <- cluster3[-cluster3set, ]
+cluster3train$cluster <- NULL
+cluster3test$cluster <- NULL
 ```
+
+## Creating Models for Cluster Analysis
+
+```{r}
+#logistic regression
+logreg4 <- glm(Churn1 ~ ., data = cluster4train, family = "binomial")
+logreg4 <- step(logreg4, direction = "backward")
+
+log4prediction <- predict(logreg4, newdata = cluster4test, type = "response")
+log4prediction <- ifelse(log4prediction > 0.5, 1, 0)
+
+confusionMatrix(as.factor(log4prediction), as.factor(cluster4test$Churn1), positive = "1")
+
+lrprediction <- predict(logreg4, newdata = cluster4test, type = "response")
+
+logreg3 <- glm(Churn1 ~ ., data = cluster3train, family = "binomial")
+logreg3 <- step(logreg3, direction = "backward")
+
+log3prediction <- predict(logreg3, newdata = cluster3test, type = "response")
+log3prediction <- ifelse(log3prediction > 0.5, 1, 0)
+
+confusionMatrix(as.factor(log3prediction), as.factor(cluster3test$Churn1), positive = "1")
+
+lrprediction <- predict(logreg3, newdata = cluster3test, type = "response")
+```
+
+```{r}
+## knn
+clients4_testlabels <- cluster4test$Churn1
+clients4_trainlabels <- cluster4train$Churn1
+clients3_testlabels <- cluster3test$Churn1
+clients3_trainlabels <- cluster3train$Churn1
+cluster4train$Churn1 <- NULL
+cluster4test$Churn1 <- NULL
+cluster3train$Churn1 <- NULL
+cluster3test$Churn1 <- NULL
+
+set.seed(579)
+KNNprediction4 <- knn(train = cluster4train, test = cluster4test,
+                      cl = clients4_trainlabels, k=sqrt(nrow(cluster4train)))
+
+CrossTable(x = clients4_testlabels,y= KNNprediction4,prop.chisq=FALSE)
+confusionMatrix(as.factor(KNNprediction4), as.factor(clients4_testlabels))
+
+KNNprediction3 <- knn(train = cluster3train, test = cluster3test,
+                      cl = clients3_trainlabels, k=sqrt(nrow(cluster3train)))
+
+CrossTable(x = clients3_testlabels,y= KNNprediction3,prop.chisq=FALSE)
+confusionMatrix(as.factor(KNNprediction3), as.factor(clients3_testlabels))
+  # Kappa = 
+
+cluster4train$Churn1 <- clients4_trainlabels
+cluster4test$Churn1 <- clients4_testlabels
+cluster3train$Churn1 <- clients3_trainlabels
+cluster3test$Churn1 <- clients3_testlabels
+  #Churn columns is restored
+```
+
+```{r}
+#neuralnet
+neural_model4 <- neuralnet(Churn1~., data=cluster4train)
+ANNprediction4 <- predict(neural_model4, newdata = cluster4test)
+
+ANNprediction4 <- ifelse(ANNprediction4 > 0.5, 1, 0)
+
+CrossTable(x = ANNprediction4, y = cluster4test$Churn, prop.chisq=FALSE)
+confusionMatrix(as.factor(ANNprediction4), as.factor(clients4_testlabels), positive = "1")
+
+  # Kappa = 
+
+ANNprediction3 <- predict(neural_model4, newdata = cluster4test)
+
+neural_model3 <- neuralnet(Churn1~., data=cluster3train)
+ANNprediction3 <- predict(neural_model3, newdata = cluster3test)
+
+ANNprediction3 <- ifelse(ANNprediction3 > 0.5, 1, 0)
+
+CrossTable(x = ANNprediction3, y = cluster3test$Churn, prop.chisq=FALSE)
+confusionMatrix(as.factor(ANNprediction3), as.factor(clients3_testlabels), positive = "1")
+
+  # Kappa = 
+
+ANNprediction3 <- predict(neural_model3, newdata = cluster3test)
+```
+
+```{r}
+#trees
+treemod4 <- C5.0(as.factor(Churn1) ~., data = cluster4train)
+treepred4 <- predict(treemod4, cluster4test)
+
+plot(treemod4)
+
+confusionMatrix(as.factor(treepred4), as.factor(clients4_testlabels))
+  # Kappa = 
+treemod3 <- C5.0(as.factor(Churn1) ~., data = cluster3train)
+treepred3 <- predict(treemod3, cluster3test)
+
+plot(treemod3)
+
+confusionMatrix(as.factor(treepred3), as.factor(clients3_testlabels))
+  # Kappa = 
+```
+
+```{r}
+#SVM
+SVM_model4 <- ksvm(as.factor(Churn1)~., data = cluster4train, kernel = "vanilladot")
+SVMprediction4 <- predict(SVM_model4, cluster4test)
+
+confusionMatrix(as.factor(SVMprediction4), as.factor(clients4_testlabels))
+
+  #Kappa = 
+SVM_model3 <- ksvm(as.factor(Churn1)~., data = cluster3train, kernel = "vanilladot")
+SVMprediction3 <- predict(SVM_model3, cluster3test)
+
+confusionMatrix(as.factor(SVMprediction3), as.factor(clients3_testlabels))
+
+  #Kappa = 
+```
+## Creating Two Stacked Models For the Clusters
+
+```{r}
+#Tree cluster 4
+allpredictions4 <- data.frame(log4prediction, KNNprediction4, ANNprediction4, SVMprediction4, treepred4, clients4_testlabels)
+summary(allpredictions4)
+
+colnames(allpredictions4)[colnames(allpredictions4) == "clients4_testlabels"] ="Churn"
+  #Dataset with all 5 predictions and the lables that contain the true values for the test dataset
+set.seed(5948)
+combined_test_set4 <- sample(1:nrow(allpredictions4), 0.3*nrow(allpredictions4)) 
+
+combined_train4 <- allpredictions4[-combined_test_set4, ]
+combined_test4 <- allpredictions4[combined_test_set4,]
+
+combined_dtree4 <- C5.0(as.factor(Churn) ~., data = combined_train4)
+plot(combined_dtree4)
+
+combined_pred4 <- predict(combined_dtree4, combined_test4)
+
+confusionMatrix(as.factor(combined_pred4), as.factor(combined_test4$Churn))
+
+# tree cluster 3
+allpredictions3 <- data.frame(log3prediction, KNNprediction3, ANNprediction3, SVMprediction3, treepred3, clients3_testlabels)
+summary(allpredictions3)
+
+colnames(allpredictions3)[colnames(allpredictions3) == "clients3_testlabels"] ="Churn"
+  #Dataset with all 5 predictions and the lables that contain the true values for the test dataset
+set.seed(5948)
+combined_test_set3 <- sample(1:nrow(allpredictions3), 0.3*nrow(allpredictions3)) 
+
+combined_train3 <- allpredictions3[-combined_test_set3, ]
+combined_test3 <- allpredictions3[combined_test_set3,]
+
+combined_dtree3 <- C5.0(as.factor(Churn) ~., data = combined_train3)
+plot(combined_dtree3)
+
+combined_pred3 <- predict(combined_dtree3, combined_test3)
+
+confusionMatrix(as.factor(combined_pred3), as.factor(combined_test3$Churn))
+
+```
+
 
