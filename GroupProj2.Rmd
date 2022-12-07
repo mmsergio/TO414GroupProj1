@@ -310,7 +310,7 @@ combined_pred2 <- predict(combined_dtree2, combined_test)
 confusionMatrix(as.factor(combined_pred2), as.factor(combined_test$Churn), positive = "1")
 ```
 
-At the expense of sacrificing some accuracy, we manage to retain 8 extra clients that we initially identified they were leaving the firm (Churn 1) but they were in fact loyal customers (Churn 0). Initially, these 8 clients would not receive the promotion, but now they do, and will remain next month. Nevertheless, 16 clients that previously we correctly identified that they were going to leave the company (True Positives), now we predict they will remain (16 more false negatives). So we will send 16 additional predictions which are going to be worthless. Let's analayze the profitability change of adding the costs Matrix:
+At the expense of sacrificing some accuracy, we manage to retain 8 extra clients that we initially identified they were leaving the firm (Churn 1) but they were in fact loyal customers (Churn 0). Initially, these 8 clients would not receive the promotion, but now they do, and will remain next month. Nevertheless, 16 clients that previously we correctly identified that they were going to leave the company (True Positives), now we predict they will remain (16 more false negatives). So we will send 16 additional promotions which are going to be worthless. Let's analayze the profitability change of adding the costs Matrix:
 
 16 + 8 = 24 additional promotions are sent                            24 * 14 = $336 additional costs during Month 1
 We get 8 more clients during Month 2                                  8 * 64.76 = $518.08 additional revenue
