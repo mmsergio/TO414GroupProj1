@@ -581,6 +581,7 @@ confusionMatrix(as.factor(combined_pred3), as.factor(combined_test3$Churn))
 
 ```
 
+<<<<<<< HEAD
 ```{r, fig.height = 10, fig.width=15}
 library(randomForest)
 #random forest to analyze cluster 4 predictor importance
@@ -593,6 +594,10 @@ varImpPlot(ranfor4, main = "Predictor Importance")
 - Which profile are we retaining and who is leaving the subscription? (Comparison among clusters and profiles) 
 
   Our cluster analysis that two clusters seem more worth targeting than the other client profiles out of the 5 clusters we observed. The cluster with the highest churn rate seems to have customers who are single, and with no kids, and requires a lot of assistance with their telecommunication services. On the other hand, the profiles who do renew their subscription and have low churn rates are those have a partner and kids, that don't get a lot of the services offered. Dependants seem to be a major factor in the churn rate, as both clusters had clients with dependants, whether single or married.
+=======
+- Which profile are we retaining and who is leaving the subscription? (Comparison among clusters and profiles)
+
+>>>>>>> 2ebcd3f8673e7e5c935229af5430811345a6faaa
 
 - What factors tend to make clients decided NOT to renew their subscription?
 
@@ -600,9 +605,14 @@ varImpPlot(ranfor4, main = "Predictor Importance")
   
 - Is there any particular client profile that is worth and feasible to target? (Best cluster in retention rate) 
   
+<<<<<<< HEAD
   In the clusters that had the lowest churn rates (highest retention), both clusters had dependants as a factor, so families and single people with dependants are the demographic of interest that would be worth targetting. This is because these clusters have long term usage with the company, so based on our analysis they would be the most likely to stay with the company the longest and renew their subscription.
   
 - How can we make the client do so? (We can compare clusters with similar demographics, and then compare the chunk rate of both similar clusters and maybe propose changes to the services offered to the cluster that is not performing well based on what is working to the other cluster with demographic similarities)
 
 Clusters 1 and 5 have similar demographics and have the highest retention rates, and they both share the trait that their contracts given their background are fit for long term use once they chose to stay with the company, so by providing them with enough services (internet,cable, tv) we ensure they will renew. On the contrary, the other 3 clusters have more unpredictability since the demographics are single people with no dependants of middle and senior age. Our models showed that accuracy for these groups is relatively low, with around 68-70%, so we can't really consistently predict whether they will renew for these groups. In order to improve this, we recommend striving to retain these clusters by providing better benefits in our service to incentivize clients renewing their subscription when they don't have a need to. 
+=======
+
+- If so, can we identify loyal clients within those profiles (or clusters)?
+>>>>>>> 2ebcd3f8673e7e5c935229af5430811345a6faaa
 
