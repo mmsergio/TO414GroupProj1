@@ -29,9 +29,7 @@ Questions for the second part:
   
   - Is there any particular client profile that is worth and feasible to target? (Best cluster in retention rate) 
   
-  - How can we make the client do so? (We can compare clusters with similar demographics, and then compare the chunk rate of both similar clusters and maybe propose changes to the services offered to the cluster that is not performing well based on what is working to the other cluster with demographic similarities)
-  
-  - Can we identify our most valuable clients by predicting its CLV? (Maybe figure out something about the consumer lifetime value or something like that)
+  - If so, can we identify loyal clients within those profiles (or clusters)? (Run predictions on 1 or 2 best clusters)
 
 
 URL to dataset: https://www.kaggle.com/datasets/blastchar/telco-customer-churn
