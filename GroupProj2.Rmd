@@ -544,7 +544,7 @@ confusionMatrix(as.factor(SVMprediction3), as.factor(clients3_testlabels))
 
 ```{r}
 #Tree cluster 4
-allpredictions4 <- data.frame(log4prediction, KNNprediction4, ANNprediction4, SVMprediction4, treepred4, clients4_testlabels)
+allpredictions4 <- data.frame(log4prediction, KNNprediction4, ANNprediction4, treepred4, clients4_testlabels)
 summary(allpredictions4)
 
 colnames(allpredictions4)[colnames(allpredictions4) == "clients4_testlabels"] ="Churn"
@@ -563,7 +563,7 @@ combined_pred4 <- predict(combined_dtree4, combined_test4)
 confusionMatrix(as.factor(combined_pred4), as.factor(combined_test4$Churn))
 
 # tree cluster 3
-allpredictions3 <- data.frame(log3prediction, KNNprediction3, ANNprediction3, SVMprediction3, treepred3, clients3_testlabels)
+allpredictions3 <- data.frame(log3prediction, KNNprediction3, ANNprediction3, treepred3, clients3_testlabels)
 summary(allpredictions3)
 
 colnames(allpredictions3)[colnames(allpredictions3) == "clients3_testlabels"] ="Churn"
@@ -583,4 +583,17 @@ confusionMatrix(as.factor(combined_pred3), as.factor(combined_test3$Churn))
 
 ```
 
+- Which profile are we retaining and who is leaving the subscription? (Comparison among clusters and profiles) 
+  During our cluster analysis, we found that two clusters seem more worth targeting than the other client profiles out of the 5 clusters we observed. The cluster with the highest churn rate seems to have customers who are single, and with no kids, and requires a lot of assistance with their telecommunication services. On the other hand, the profiles who don't renew their subscription and have low churn rates are those have a  partner and kids, that don't get a lot of the services offered.
+
+- What factors tend to make clients decided NOT to renew their subscription?
+  
+  
+- Is there any particular client profile that is worth and feasible to target? (Best cluster in retention rate) 
+  
+  
+- How can we make the client do so? (We can compare clusters with similar demographics, and then compare the chunk rate of both similar clusters and maybe propose changes to the services offered to the cluster that is not performing well based on what is working to the other cluster with demographic similarities)
+  
+  
+- Can we identify our most valuable clients by predicting its CLV? (Maybe figure out something about the consumer lifetime value or something like that)
 
